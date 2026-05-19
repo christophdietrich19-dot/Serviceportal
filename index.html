@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Serviceportal v0.4.1</title>
+
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <!-- LOGIN -->
+  <section id="loginView" class="view login-view">
+    <div class="login-card">
+      <p class="eyebrow">Interner Prototyp</p>
+      <h1>Serviceportal v0.4.1</h1>
+      <p class="subtitle">Service, Wartung und Einsatzplanung übersichtlich verwalten.</p>
+
+      <div class="form login-form">
+        <input id="loginEmail" type="email" placeholder="E-Mail" autocomplete="email" />
+        <input id="loginPassword" type="password" placeholder="Passwort" autocomplete="current-password" />
+
+        <button id="loginButton" type="button">Einloggen</button>
+
+        <p class="hint">
+          Demo-Zugang für Testzwecke<br />
+          E-Mail: admin@demo.de<br />
+          Passwort: admin123
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- BEGRÜSSUNG -->
+  <section id="welcomeView" class="view welcome-view hidden">
+    <div class="welcome-card">
+      <p class="eyebrow">Serviceportal</p>
+      <div class="welcome-icon">🛠️</div>
+      <h1 id="welcomeTitle">Willkommen zurück.</h1>
+      <p id="welcomeText">Das Serviceportal wird vorbereitet.</p>
+
+      <div class="loading-bar">
+        <div class="loading-progress"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- APP -->
+  <section id="appView" class="app-view hidden">
+
+    <div id="menuOverlay" class="menu-overlay hidden"></div>
+
+    <aside id="sideMenu" class="side-menu">
+      <div class="side-menu-header">
+        <div>
+          <p class="eyebrow">Serviceportal</p>
+          <h2>Navigation</h2>
+        </div>
+
+        <button id="closeMenuButton" class="icon-button" type="button" aria-label="Menü schließen">×</button>
+      </div>
+
+      <nav class="menu-nav">
+        <button class="menu-link active" type="button" data-page="dashboardPage">Dashboard</button>
+        <button class="menu-link" type="button" data-page="technicianPage">Meine Einsätze</button>
+        <button class="menu-link" type="button" data-page="calendarPage">Kalender & Planung</button>
+        <button class="menu-link" type="button" data-page="remindersPage">Heute wichtig</button>
+        <button class="menu-link" type="button" data-page="customersPage">Kunden & Servicefälle</button>
+        <button class="menu-link" type="button" data-page="newCustomerPage">Neuer Kunde / Servicefall</button>
+        <button class="menu-link" type="button" data-page="statusBoardPage">Statusboard</button>
+        <button class="menu-link" type="button" data-page="reportsPage">Serviceberichte</button>
+        <button class="menu-link admin-only" type="button" data-page="teamPage">Mitarbeiter</button>
+        <button class="menu-link" type="button" data-page="settingsPage">Portal Einstellungen</button>
+        <button id="helpMenuButton" class="menu-link" type="button">Hilfe & Support</button>
+      </nav>
+
+      <div class="side-menu-footer">
+        <p>Angemeldet als</p>
+        <strong id="menuUserName">Benutzer</strong>
+        <span id="menuUserRole">Rolle</span>
+        <span class="app-version">v0.4.1 Präsentationsstand</span>
+      </div>
+    </aside>
+
+    <header class="topbar">
+      <div class="topbar-left">
+        <button id="openMenuButton" class="menu-button" type="button" aria-label="Menü öffnen">☰</button>
+
+        <div>
+          <p class="eyebrow">Interner Prototyp</p>
+          <h1>Serviceportal v0.4.1</h1>
+          <p class="subtitle">Service · Wartung · Einsatzplanung</p>
+        </div>
+      </div>
+
+      <div class="user-panel">
+        <span id="currentUserRole">Rolle</span>
+        <strong id="currentUserName">Benutzer</strong>
+
+        <div class="user-actions">
+          <button id="themeButton" class="small-button" type="button">Hell / Dunkel</button>
+          <button id="logoutButton" class="small-button" type="button">Abmelden</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="layout">
+
+      <!-- DASHBOARD -->
+      <section id="dashboardPage" class="page active-page">
+        <section class="hero-panel">
+          <div>
+            <p class="eyebrow">Dashboard</p>
+            <h2 id="dashboardGreeting">Aktuelle Einsätze, Erinnerungen und Servicefälle auf einen Blick.</h2>
+            <p id="dailyMessage">Hier werden die wichtigsten Aufgaben und offenen Punkte angezeigt.</p>
+          </div>
+
+          <div class="portal-badge">Service · Wartung · Planung</div>
+        </section>
+
+        <section class="stats-grid">
+          <article class="stat-card highlight">
+            <p>Kunden</p>
+            <h3 id="customerCount">0</h3>
+            <span>Gespeicherte Kunden & Anlagen</span>
+          </article>
+
+          <article class="stat-card">
+            <p>Offene Fälle</p>
+            <h3 id="openCount">0</h3>
+            <span>Aktive Servicefälle</span>
+          </article>
+
+          <article class="stat-card warning">
+            <p>Fällige Erinnerungen</p>
+            <h3 id="dueCount">0</h3>
+            <span>Anstehende Aufgaben</span>
+          </article>
+
+          <article class="stat-card danger">
+            <p>Dringende Fälle</p>
+            <h3 id="urgentCount">0</h3>
+            <span>Priorität hoch</span>
+          </article>
+
+          <article class="stat-card">
+            <p>Benutzerkonten</p>
+            <h3 id="accountCount">0</h3>
+            <span>Angelegte Zugänge</span>
+          </article>
+        </section>
+
+        <section class="dashboard-grid">
+          <article class="panel important-dashboard-panel">
+            <div class="panel-header">
+              <p class="eyebrow">Heute wichtig</p>
+              <h2>Fällige Erinnerungen und dringende Fälle</h2>
+            </div>
+
+            <div id="dashboardImportantList" class="item-list">
+              <p class="empty">Aktuell sind keine Erinnerungen oder dringenden Fälle fällig.</p>
+            </div>
+          </article>
+
+          <article class="panel">
+            <div class="panel-header">
+              <p class="eyebrow">Schnellzugriff</p>
+              <h2>Häufig genutzte Bereiche</h2>
+            </div>
+
+            <div class="quick-actions-column">
+              <button type="button" data-page-target="technicianPage">Meine Einsätze öffnen</button>
+              <button type="button" data-page-target="calendarPage">Kalender & Planung öffnen</button>
+              <button type="button" data-page-target="newCustomerPage">Neuen Kunden / Servicefall anlegen</button>
+              <button type="button" data-page-target="statusBoardPage">Statusboard öffnen</button>
+              <button type="button" data-page-target="customersPage">Kunden & Servicefälle anzeigen</button>
+              <button type="button" data-page-target="reportsPage">Serviceberichte ansehen</button>
+            </div>
+          </article>
+        </section>
+      </section>
+
+      <!-- TECHNIKERANSICHT -->
+      <section id="technicianPage" class="page hidden">
+        <button class="back-button" type="button" data-page-target="dashboardPage">← Zurück zum Dashboard</button>
+
+        <section class="technician-hero">
+          <div>
+            <p class="eyebrow">Technikeransicht</p>
+            <h2>Meine Einsätze</h2>
+            <p id="technicianIntro">Hier werden zugewiesene offene Servicefälle und kommende Termine angezeigt.</p>
+          </div>
+
+          <div class="technician-badge">Mobile Einsatzansicht</div>
+        </section>
+
+        <section class="stats-grid technician-stats">
+          <article class="stat-card">
+            <p>Offen</p>
+            <h3 id="technicianOpenCount">0</h3>
+            <span>Einsätze</span>
+          </article>
+
+          <article class="stat-card warning">
+            <p>In Bearbeitung</p>
+            <h3 id="technicianProgressCount">0</h3>
+            <span>Einsätze</span>
+          </article>
+
+          <article class="stat-card danger">
+            <p>Dringend</p>
+            <h3 id="technicianUrgentCount">0</h3>
+            <span>Einsätze</span>
+          </article>
+
+          <article class="stat-card highlight">
+            <p>Erledigt</p>
+            <h3 id="technicianDoneCount">0</h3>
+            <span>Einsätze</span>
+          </article>
+        </section>
+
+        <section class="panel">
+          <div class="panel-header">
+            <p class="eyebrow">Heute</p>
+            <h2>Heutige Route</h2>
+          </div>
+
+          <div id="technicianRouteList" class="technician-list">
+            <p class="empty">Heute sind keine Einsätze geplant.</p>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-header">
+            <p class="eyebrow">Kommende Einsätze</p>
+            <h2>Nächste Termine</h2>
+          </div>
+
+          <div id="technicianUpcomingList" class="technician-list">
+            <p class="empty">Aktuell sind keine offenen Einsätze zugewiesen.</p>
+          </div>
+        </section>
+      </section>
+
+      <!-- KALENDER -->
+      <section id="calendarPage" class="page hidden">
+        <button class="back-button" type="button" data-page-target="dashboardPage">← Zurück zum Dashboard</button>
+
+        <section class="panel">
+          <div class="panel-header">
+            <p class="eyebrow">Kalender & Planung</p>
+            <h2>Einsatzplanung</h2>
+          </div>
+
+          <div id="calendarGrid" class="calendar-grid">
+            <p class="empty">Kalender wird geladen.</p>
+          </div>
+        </section>
+      </section>
+
+      <!-- HEUTE WICHTIG -->
+      <section id="remindersPage" class="page hidden">
+        <button class="back-button" type="button" data-page-target="dashboardPage">← Zurück zum Dashboard</button>
+
+        <section class="panel important-panel">
+          <div class="panel-header">
+            <p class="eyebrow">Heute wichtig</p>
+            <h2>Fällige Erinnerungen und dringende Fälle</h2>
+          </div>
+
+          <div id="importantList" class="item-list">
+            <p class="empty">Aktuell sind keine Erinnerungen oder dringenden Fälle fällig.</p>
+          </div>
+        </section>
+      </section>
+
+      <!-- KUNDEN -->
+      <section id="customersPage" class="page hidden">
+        <button class="back-button" type="button" data-page-target="dashboardPage">← Zurück zum Dashboard</button>
+
+        <section class="panel">
+          <div class="panel-header">
+            <p class="eyebrow">Kunden & Servicefälle</p>
+            <h2>Kunden und Termine</h2>
+          </div>
+
+          <div class="filter-grid">
+            <input id="customerSearch" type="text" placeholder="Kunde, Ort, Adresse, Mitarbeiter, Maschinentyp oder Erinnerung suchen..." />
+
+            <select id="statusFilter">
+              <option value="all">Alle Status</option>
+              <option value="open">Offen</option>
+              <option value="progress">In Bearbeitung</option>
+              <option value="done">Erledigt</option>
+            </select>
+          </div>
+
+          <div id="customersList" class="customer-list">
+            <p class="empty">Noch keine Kunden oder Servicefälle eingetragen.</p>
+          </div>
+        </section>
+      </section>
+
+      <!-- NEUER EINTRAG -->
+      <section id="newCustomerPage" class="page hidden">
+        <button class="back-button" type="button" data-page-target="dashboardPage">← Zurück zum Dashboard</button>
+
+        <section class="panel">
+          <div class="panel-header">
+            <p class="eyebrow">Neuer Kunde / Servicefall</p>
+            <h2>Kunde oder Servicefall hinzufügen</h2>
+          </div>
+
+          <form id="customerForm" class="form">
+            <input id="customerName" type="text" placeholder="Kundenname, z. B. Bowling Arena Leipzig" required />
+            <input id="customerCity" type="text" placeholder="Ort, z. B. Leipzig" />
+            <input id="customerAddress" type="text" placeholder="Adresse" />
+            <input id="customerPhone" type="text" placeholder="Telefonnummer" />
+            <input id="customerEmail" type="email" placeholder="E-Mail" />
+
+            <select id="customerSystem">
+              <option value="Bowlingbahn">Bowlingbahn</option>
+              <option value="Kegelbahn">Kegelbahn</option>
+              <option value="Bowling- und Kegelbahn">Bowling- und Kegelbahn</option>
+            </select>
+
+            <select id="machineType">
+              <option value="">Maschinentyp / Hersteller nicht angegeben</option>
+              <option value="Funk">Funk</option>
+              <option value="Spellmann">Spellmann</option>
+              <option value="Pauly">Pauly</option>
+              <option value="SES">SES</option>
+              <option value="Ahlborn">Ahlborn</option>
+              <option value="Vollmer">Vollmer</option>
+              <option value="Spieth">Spieth</option>
+              <option value="Pro-Tec">Pro-Tec</option>
+              <option value="KTD">KTD</option>
+              <option value="Sonstige">Sonstige</option>
+            </select>
+
+            <input id="laneCount" type="number" min="1" max="99" step="1" placeholder="Bahnanzahl, z. B. 8" />
+            <input id="maintenancePerLane" type="text" placeholder="Wartung pro Bahn, z. B. 2x jährlich oder 150 €" />
+
+            <select id="serviceType">
+              <option value="Wartung">Wartung</option>
+              <option value="Reparatur">Reparatur</option>
+              <option value="Rückruf">Rückruf</option>
+              <option value="Angebot">Angebot</option>
+              <option value="Kontrolle">Kontrolle</option>
+            </select>
+
+            <select id="priority">
+              <option value="normal">Priorität: Normal</option>
+              <option value="high">Priorität: Hoch</option>
+              <option value="urgent">Priorität: Dringend</option>
+            </select>
+
+            <select id="assignedTo">
+              <option value="">Nicht zugewiesen</option>
+            </select>
+
+            <select id="status">
+              <option value="open">Offen</option>
+              <option value="progress">In Bearbeitung</option>
+              <option value="done">Erledigt</option>
+            </select>
+
+            <input id="nextDate" type="date" />
+
+            <select id="reminderType">
+              <option value="">Keine Erinnerung</option>
+              <option value="Kunde anrufen">Kunde anrufen</option>
+              <option value="E-Mail schreiben">E-Mail schreiben</option>
+              <option value="Wartung fällig">Wartung fällig</option>
+              <option value="Rückmeldung offen">Rückmeldung offen</option>
+              <option value="Termin bestätigen">Termin bestätigen</option>
+            </select>
+
+            <input id="reminderDate" type="date" />
+
+            <textarea id="note" placeholder="Notiz zum Servicefall, zur Wartung oder zur nächsten Rückmeldung"></textarea>
+
+            <label class="file-box">
+              Bild zur Reparatur oder Wartung anhängen
+              <input id="serviceImage" type="file" accept="image/*" />
+            </label>
+
+            <button type="submit">Kunde / Servicefall speichern</button>
+          </form>
+        </section>
+      </section>
+
+      <!-- STATUSBOARD -->
+      <section id="statusBoardPage" class="page hidden">
+        <button class="back-button" type="button" data-page-target="dashboardPage">← Zurück zum Dashboard</button>
+
+        <section class="panel">
+          <div class="panel-header">
+            <p class="eyebrow">Statusboard</p>
+            <h2>Servicefälle nach Bearbeitungsstand</h2>
+          </div>
+
+          <div class="board-grid">
+            <section class="board-column">
+              <div class="board-column-header">
+                <h3>Offen</h3>
+                <span id="boardOpenCount">0</span>
+              </div>
+              <div id="boardOpenList" class="board-list"></div>
+            </section>
+
+            <section class="board-column">
+              <div class="board-column-header">
+                <h3>In Bearbeitung</h3>
+                <span id="boardProgressCount">0</span>
+              </div>
+              <div id="boardProgressList" class="board-list"></div>
+            </section>
+
+            <section class="board-column">
+              <div class="board-column-header">
+                <h3>Erledigt</h3>
+                <span id="boardDoneCount">0</span>
+              </div>
+              <div id="boardDoneList" class="board-list"></div>
+            </section>
+          </div>
+        </section>
+      </section>
+
+      <!-- SERVICEBERICHTE -->
+      <section id="reportsPage" class="page hidden">
+        <button class="back-button" type="button" data-page-target="dashboardPage">← Zurück zum Dashboard</button>
+
+        <section class="panel">
+          <div class="panel-header">
+            <p class="eyebrow">Serviceberichte</p>
+            <h2>Serviceberichte und erledigte Fälle</h2>
+          </div>
+
+          <div id="reportsList" class="customer-list">
+            <p class="empty">Noch keine Serviceberichte vorhanden.</p>
+          </div>
+        </section>
+      </section>
+
+      <!-- MITARBEITER -->
+      <section id="teamPage" class="page hidden">
+        <button class="back-button" type="button" data-page-target="dashboardPage">← Zurück zum Dashboard</button>
+
+        <section id="teamAdminPanel" class="panel">
+          <div class="panel-header">
+            <p class="eyebrow">Mitarbeiter</p>
+            <h2>Mitarbeiterkonto anlegen</h2>
+          </div>
+
+          <form id="accountForm" class="form">
+            <input id="accountName" type="text" placeholder="Vorname und Nachname" required />
+            <input id="accountEmail" type="email" placeholder="E-Mail" required />
+            <input id="accountPassword" type="password" placeholder="Passwort" autocomplete="new-password" required />
+
+            <select id="accountRole">
+              <option value="employee">Mitarbeiter</option>
+              <option value="admin">Admin</option>
+            </select>
+
+            <button type="submit">Konto anlegen</button>
+          </form>
+
+          <div id="accountsList" class="account-list"></div>
+        </section>
+
+        <section id="teamAccessNotice" class="panel hidden">
+          <div class="panel-header">
+            <p class="eyebrow">Zugriff eingeschränkt</p>
+            <h2>Mitarbeiterverwaltung</h2>
+          </div>
+
+          <p class="muted-text">Dieser Bereich ist nur für Admins sichtbar.</p>
+        </section>
+      </section>
+
+      <!-- EINSTELLUNGEN -->
+      <section id="settingsPage" class="page hidden">
+        <button class="back-button" type="button" data-page-target="dashboardPage">← Zurück zum Dashboard</button>
+
+        <section class="panel">
+          <div class="panel-header">
+            <p class="eyebrow">Portal Einstellungen</p>
+            <h2>Projektinformation</h2>
+          </div>
+
+          <p class="muted-text">
+            Aktueller Stand: Präsentationsprototyp v0.4.1
+          </p>
+
+          <p class="muted-text">
+            Die Daten werden aktuell lokal im Browser gespeichert. Für den produktiven Einsatz wären Datenbank, Benutzerrechte und weitere Sicherheitsfunktionen sinnvoll.
+          </p>
+
+          <p class="muted-text">
+            Entwicklung: Christoph Dietrich
+          </p>
+
+          <div class="settings-actions">
+            <button id="themeButtonSettings" type="button">Hell / Dunkel wechseln</button>
+            <button id="loadDemoDataButton" type="button">Demo-Daten laden</button>
+            <button id="resetDataButton" class="danger-outline-button" type="button">Demo zurücksetzen</button>
+          </div>
+        </section>
+      </section>
+
+    </main>
+
+    <button id="floatingHelpButton" class="help-floating-button" type="button" aria-label="Hilfe öffnen">?</button>
+  </section>
+
+  <!-- HILFE -->
+  <section id="helpModal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-card help-card">
+      <div class="modal-header">
+        <div>
+          <p class="eyebrow">Hilfe & Support</p>
+          <h2>Support & Weiterentwicklung</h2>
+        </div>
+
+        <button id="closeHelpButton" class="icon-button" type="button" aria-label="Schließen">×</button>
+      </div>
+
+      <div class="help-content">
+        <div class="help-icon">🛠️</div>
+
+        <p><strong>Christoph Dietrich</strong></p>
+
+        <p>
+          Interner Prototyp zur besseren Übersicht von Service, Wartung und Einsatzplanung.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- KUNDENAKTE -->
+  <section id="customerDetailModal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-card detail-card">
+      <div class="modal-header">
+        <div>
+          <p class="eyebrow">Kundenakte</p>
+          <h2>Kundendetails</h2>
+        </div>
+
+        <button id="closeDetailButton" class="icon-button" type="button" aria-label="Schließen">×</button>
+      </div>
+
+      <div id="customerDetailContent"></div>
+    </div>
+  </section>
+
+  <!-- BEARBEITEN -->
+  <section id="editCustomerModal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div>
+          <p class="eyebrow">Eintrag bearbeiten</p>
+          <h2>Kundendaten ändern</h2>
+        </div>
+
+        <button id="closeEditButton" class="icon-button" type="button" aria-label="Schließen">×</button>
+      </div>
+
+      <form id="editCustomerForm" class="form">
+        <input id="editCustomerId" type="hidden" />
+
+        <input id="editCustomerName" type="text" placeholder="Kundenname" required />
+        <input id="editCustomerCity" type="text" placeholder="Ort" />
+        <input id="editCustomerAddress" type="text" placeholder="Adresse" />
+        <input id="editCustomerPhone" type="text" placeholder="Telefonnummer" />
+        <input id="editCustomerEmail" type="email" placeholder="E-Mail" />
+
+        <select id="editCustomerSystem">
+          <option value="Bowlingbahn">Bowlingbahn</option>
+          <option value="Kegelbahn">Kegelbahn</option>
+          <option value="Bowling- und Kegelbahn">Bowling- und Kegelbahn</option>
+        </select>
+
+        <select id="editMachineType">
+          <option value="">Maschinentyp / Hersteller nicht angegeben</option>
+          <option value="Funk">Funk</option>
+          <option value="Spellmann">Spellmann</option>
+          <option value="Pauly">Pauly</option>
+          <option value="SES">SES</option>
+          <option value="Ahlborn">Ahlborn</option>
+          <option value="Vollmer">Vollmer</option>
+          <option value="Spieth">Spieth</option>
+          <option value="Pro-Tec">Pro-Tec</option>
+          <option value="KTD">KTD</option>
+          <option value="Sonstige">Sonstige</option>
+        </select>
+
+        <input id="editLaneCount" type="number" min="1" max="99" step="1" placeholder="Bahnanzahl, z. B. 8" />
+        <input id="editMaintenancePerLane" type="text" placeholder="Wartung pro Bahn, z. B. 2x jährlich oder 150 €" />
+
+        <select id="editServiceType">
+          <option value="Wartung">Wartung</option>
+          <option value="Reparatur">Reparatur</option>
+          <option value="Rückruf">Rückruf</option>
+          <option value="Angebot">Angebot</option>
+          <option value="Kontrolle">Kontrolle</option>
+        </select>
+
+        <select id="editPriority">
+          <option value="normal">Priorität: Normal</option>
+          <option value="high">Priorität: Hoch</option>
+          <option value="urgent">Priorität: Dringend</option>
+        </select>
+
+        <select id="editAssignedTo">
+          <option value="">Nicht zugewiesen</option>
+        </select>
+
+        <select id="editStatus">
+          <option value="open">Offen</option>
+          <option value="progress">In Bearbeitung</option>
+          <option value="done">Erledigt</option>
+        </select>
+
+        <input id="editNextDate" type="date" />
+
+        <select id="editReminderType">
+          <option value="">Keine Erinnerung</option>
+          <option value="Kunde anrufen">Kunde anrufen</option>
+          <option value="E-Mail schreiben">E-Mail schreiben</option>
+          <option value="Wartung fällig">Wartung fällig</option>
+          <option value="Rückmeldung offen">Rückmeldung offen</option>
+          <option value="Termin bestätigen">Termin bestätigen</option>
+        </select>
+
+        <input id="editReminderDate" type="date" />
+        <textarea id="editNote" placeholder="Notiz"></textarea>
+
+        <button type="submit">Änderungen speichern</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- BERICHT -->
+  <section id="reportModal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-card report-card">
+      <div class="modal-header no-print">
+        <div>
+          <p class="eyebrow">Servicebericht</p>
+          <h2>Berichtsvorschau</h2>
+        </div>
+
+        <button id="closeReportButton" class="icon-button" type="button" aria-label="Schließen">×</button>
+      </div>
+
+      <div id="reportContent"></div>
+
+      <div class="report-actions no-print">
+        <button id="printReportButton" type="button">Bericht drucken / als PDF speichern</button>
+      </div>
+    </div>
+  </section>
+
+  <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
+
+  <!-- MOBILE NAVIGATION -->
+  <nav class="mobile-nav" aria-label="Mobile Navigation">
+    <button class="mobile-nav-button active" type="button" data-page="dashboardPage">
+      <span>⌂</span>
+      <small>Start</small>
+    </button>
+
+    <button class="mobile-nav-button" type="button" data-page="technicianPage">
+      <span>◈</span>
+      <small>Einsätze</small>
+    </button>
+
+    <button class="mobile-nav-button" type="button" data-page="calendarPage">
+      <span>□</span>
+      <small>Planung</small>
+    </button>
+
+    <button class="mobile-nav-button" type="button" data-page="customersPage">
+      <span>◇</span>
+      <small>Kunden</small>
+    </button>
+
+    <button class="mobile-nav-button plus-button" type="button" data-page="newCustomerPage" aria-label="Neuer Kunde oder Servicefall">
+      <span>＋</span>
+    </button>
+  </nav>
+
+  <script src="js/storage.js"></script>
+  <script src="js/reminders.js"></script>
+  <script src="js/reports.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/dragdrop.js"></script>
+  <script src="js/calendar.js"></script>
+  <script src="js/technician.js"></script>
+  <script src="js/customers.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
