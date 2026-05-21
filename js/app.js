@@ -20,8 +20,16 @@ document.addEventListener("DOMContentLoaded", () => {
     DragDropService.initialize();
   }
 
+  if (typeof I18nService !== "undefined") {
+    I18nService.applyLanguage();
+  }
+
   CustomerService.renderAll();
   AuthService.refreshAssignableUserSelects();
+
+  if (typeof I18nService !== "undefined") {
+    I18nService.applyLanguage();
+  }
 
   showLoginView();
 });
@@ -39,12 +47,28 @@ function bindGlobalEvents() {
     UIService.closeMenu();
   });
 
+  UIService.getElement("languageButton")?.addEventListener("click", () => {
+    handleLanguageToggle();
+  });
+
+  UIService.getElement("languageButtonSettings")?.addEventListener("click", () => {
+    handleLanguageToggle();
+  });
+
   UIService.getElement("themeButton")?.addEventListener("click", () => {
     UIService.toggleTheme();
+
+    if (typeof I18nService !== "undefined") {
+      I18nService.applyLanguage();
+    }
   });
 
   UIService.getElement("themeButtonSettings")?.addEventListener("click", () => {
     UIService.toggleTheme();
+
+    if (typeof I18nService !== "undefined") {
+      I18nService.applyLanguage();
+    }
   });
 
   UIService.getElement("logoutButton")?.addEventListener("click", handleLogout);
@@ -78,7 +102,7 @@ function bindGlobalEvents() {
   });
 
   UIService.getElement("loadDemoDataButton")?.addEventListener("click", () => {
-    const confirmed = confirm("Demo-Daten laden? Bestehende Demo-Daten werden ersetzt.");
+    const confirmed = confirm(getTranslation("confirmLoadDemo"));
 
     if (!confirmed) {
       return;
@@ -86,22 +110,32 @@ function bindGlobalEvents() {
 
     StorageService.loadDemoData();
     CustomerService.renderAll();
-    UIService.showToast("Demo-Daten wurden geladen.");
+
+    if (typeof I18nService !== "undefined") {
+      I18nService.applyLanguage();
+    }
+
+    UIService.showToast(getTranslation("toastDemoLoaded"));
   });
 
   UIService.getElement("resetDataButton")?.addEventListener("click", () => {
-    const confirmed = confirm("Alle Kunden und Demo-Daten wirklich löschen?");
+    const confirmed = confirm(getTranslation("confirmResetDemo"));
 
     if (!confirmed) {
       return;
     }
 
     StorageService.resetAllData();
+
     CustomerService.renderAll();
     AuthService.renderAccounts();
     AuthService.refreshAssignableUserSelects();
 
-    UIService.showToast("Demo-Daten wurden zurückgesetzt.");
+    if (typeof I18nService !== "undefined") {
+      I18nService.applyLanguage();
+    }
+
+    UIService.showToast(getTranslation("toastDemoReset"));
   });
 
   document.addEventListener("keydown", event => {
@@ -110,7 +144,8 @@ function bindGlobalEvents() {
       UIService.closeMenu();
     }
 
-    const loginIsVisible = !UIService.getElement("loginView")?.classList.contains("hidden");
+    const loginView = UIService.getElement("loginView");
+    const loginIsVisible = loginView && !loginView.classList.contains("hidden");
 
     if (loginIsVisible && event.key === "Enter") {
       handleLogin();
@@ -138,10 +173,18 @@ function bindGlobalEvents() {
 
   UIService.getElement("customerSearch")?.addEventListener("input", () => {
     CustomerService.renderCustomers();
+
+    if (typeof I18nService !== "undefined") {
+      I18nService.applyLanguage();
+    }
   });
 
   UIService.getElement("statusFilter")?.addEventListener("change", () => {
     CustomerService.renderCustomers();
+
+    if (typeof I18nService !== "undefined") {
+      I18nService.applyLanguage();
+    }
   });
 }
 
@@ -155,6 +198,10 @@ function bindNavigation() {
       }
 
       UIService.showPage(page);
+
+      if (typeof I18nService !== "undefined") {
+        I18nService.applyLanguage();
+      }
     });
   });
 
@@ -167,6 +214,10 @@ function bindNavigation() {
       }
 
       UIService.showPage(page);
+
+      if (typeof I18nService !== "undefined") {
+        I18nService.applyLanguage();
+      }
     });
   });
 }
@@ -176,16 +227,19 @@ function bindForms() {
 
   UIService.getElement("customerForm")?.addEventListener("submit", event => {
     event.preventDefault();
+
     CustomerService.createCustomerFromForm();
   });
 
   UIService.getElement("editCustomerForm")?.addEventListener("submit", event => {
     event.preventDefault();
+
     CustomerService.saveEditedCustomer();
   });
 
   UIService.getElement("accountForm")?.addEventListener("submit", event => {
     event.preventDefault();
+
     handleAccountCreation();
   });
 }
@@ -197,22 +251,34 @@ function handleLogin() {
   const result = AuthService.login(email, password);
 
   if (!result.success) {
-    UIService.showToast(result.message);
+    UIService.showToast(getTranslation("toastLoginFailed"));
     return;
   }
 
   AuthService.updateUserDisplay();
 
+  if (typeof I18nService !== "undefined") {
+    I18nService.applyLanguage();
+  }
+
   showWelcomeScreen(() => {
     showAppView();
+
     CustomerService.renderAll();
     UIService.showPage("dashboardPage");
-    UIService.showToast(`Willkommen zurück, ${result.user.name}.`);
+
+    if (typeof I18nService !== "undefined") {
+      I18nService.applyLanguage();
+    }
+
+    UIService.showToast(getTranslation("toastWelcome", {
+      name: result.user.name
+    }));
   });
 }
 
 function handleLogout() {
-  const confirmed = confirm("Möchtest du dich wirklich abmelden?");
+  const confirmed = confirm(getTranslation("confirmLogout"));
 
   if (!confirmed) {
     return;
@@ -228,7 +294,11 @@ function handleLogout() {
 
   showLoginView();
 
-  UIService.showToast("Du wurdest abgemeldet.");
+  if (typeof I18nService !== "undefined") {
+    I18nService.applyLanguage();
+  }
+
+  UIService.showToast(getTranslation("toastLoggedOut"));
 }
 
 function handleAccountCreation() {
@@ -254,18 +324,44 @@ function handleAccountCreation() {
 
   AuthService.renderAccounts();
   AuthService.refreshAssignableUserSelects();
+
+  if (typeof I18nService !== "undefined") {
+    I18nService.applyLanguage();
+  }
+}
+
+function handleLanguageToggle() {
+  if (typeof I18nService === "undefined") {
+    return;
+  }
+
+  I18nService.toggleLanguage();
+
+  CustomerService.renderAll();
+  AuthService.updateUserDisplay();
+  AuthService.refreshAssignableUserSelects();
+
+  I18nService.applyLanguage();
 }
 
 function showLoginView() {
   UIService.showElement("loginView");
   UIService.hideElement("welcomeView");
   UIService.hideElement("appView");
+
+  if (typeof I18nService !== "undefined") {
+    I18nService.applyLanguage();
+  }
 }
 
 function showWelcomeScreen(callback) {
   UIService.hideElement("loginView");
   UIService.showElement("welcomeView");
   UIService.hideElement("appView");
+
+  if (typeof I18nService !== "undefined") {
+    I18nService.applyLanguage();
+  }
 
   setTimeout(() => {
     callback();
@@ -276,4 +372,16 @@ function showAppView() {
   UIService.hideElement("loginView");
   UIService.hideElement("welcomeView");
   UIService.showElement("appView");
+
+  if (typeof I18nService !== "undefined") {
+    I18nService.applyLanguage();
+  }
+}
+
+function getTranslation(key, replacements = {}) {
+  if (typeof I18nService === "undefined") {
+    return key;
+  }
+
+  return I18nService.t(key, replacements);
 }

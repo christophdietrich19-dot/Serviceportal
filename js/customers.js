@@ -26,7 +26,7 @@ const CustomerService = (() => {
     };
 
     if (!customer.name) {
-      UIService.showToast("Bitte mindestens einen Kundennamen eintragen.");
+      UIService.showToast(translate("toastCustomerMissing", "Bitte mindestens einen Kundennamen eintragen."));
       return;
     }
 
@@ -54,7 +54,12 @@ const CustomerService = (() => {
 
     renderAll();
     UIService.showPage("customersPage");
-    UIService.showToast("Kunde / Servicefall wurde gespeichert.");
+
+    if (typeof I18nService !== "undefined") {
+      I18nService.applyLanguage();
+    }
+
+    UIService.showToast(translate("toastCustomerSaved", "Kunde / Servicefall wurde gespeichert."));
   }
 
   function renderAll() {
@@ -74,6 +79,10 @@ const CustomerService = (() => {
 
     AuthService.renderAccounts();
     AuthService.refreshAssignableUserSelects();
+
+    if (typeof I18nService !== "undefined") {
+      I18nService.applyLanguage();
+    }
   }
 
   function renderDashboard() {
@@ -92,8 +101,11 @@ const CustomerService = (() => {
 
     const message =
       dueCustomers.length === 0 && urgentCustomers.length === 0
-        ? "Aktuell sind keine fälligen Erinnerungen oder dringenden Fälle vorhanden."
-        : `Heute wichtig: ${dueCustomers.length} Erinnerung(en) und ${urgentCustomers.length} dringende Fälle prüfen.`;
+        ? translate("dashboardNoOpenItems", "Aktuell sind keine fälligen Erinnerungen oder dringenden Fälle vorhanden.")
+        : translate("dashboardImportantMessage", "Heute wichtig: {due} Erinnerung(en) und {urgent} dringende Fälle prüfen.", {
+            due: dueCustomers.length,
+            urgent: urgentCustomers.length
+          });
 
     UIService.setText("dailyMessage", message);
   }
@@ -110,7 +122,7 @@ const CustomerService = (() => {
     list.innerHTML = "";
 
     if (customers.length === 0) {
-      list.innerHTML = `<p class="empty">Keine passenden Kunden oder Servicefälle gefunden.</p>`;
+      list.innerHTML = `<p class="empty">${translate("customersNoResults", "Keine passenden Kunden oder Servicefälle gefunden.")}</p>`;
       return;
     }
 
@@ -151,8 +163,8 @@ const CustomerService = (() => {
         <div>
           <h3>${ReportService.escapeHtml(customer.name)}</h3>
           <p>
-            ${ReportService.escapeHtml(customer.city || "Ort nicht angegeben")}
-            · ${ReportService.escapeHtml(customer.serviceType || "Servicefall")}
+            ${ReportService.escapeHtml(customer.city || translate("locationOpen", "Ort offen"))}
+            · ${ReportService.escapeHtml(ReminderService.translateStoredServiceType(customer.serviceType) || translate("serviceCase", "Servicefall"))}
           </p>
         </div>
 
@@ -169,23 +181,23 @@ const CustomerService = (() => {
 
       <div class="info-mini-grid">
         <div>
-          <strong>Maschine</strong>
-          <span>${ReportService.escapeHtml(customer.machineType || "Nicht angegeben")}</span>
+          <strong>${translate("labelMachineType", "Maschinentyp")}</strong>
+          <span>${ReportService.escapeHtml(customer.machineType || translate("notSpecified", "Nicht angegeben"))}</span>
         </div>
 
         <div>
-          <strong>Bahnen</strong>
-          <span>${ReportService.escapeHtml(customer.laneCount || "Nicht angegeben")}</span>
+          <strong>${translate("labelLanes", "Bahnanzahl")}</strong>
+          <span>${ReportService.escapeHtml(customer.laneCount || translate("notSpecified", "Nicht angegeben"))}</span>
         </div>
 
         <div>
-          <strong>Termin</strong>
-          <span>${customer.nextDate ? ReminderService.formatDate(customer.nextDate) : "Noch offen"}</span>
+          <strong>${translate("labelAppointment", "Termin")}</strong>
+          <span>${customer.nextDate ? ReminderService.formatDate(customer.nextDate) : translate("noDateOpen", "Noch offen")}</span>
         </div>
 
         <div>
-          <strong>Mitarbeiter</strong>
-          <span>${ReportService.escapeHtml(customer.assignedTo || "Nicht zugewiesen")}</span>
+          <strong>${translate("labelTechnician", "Techniker")}</strong>
+          <span>${ReportService.escapeHtml(customer.assignedTo || translate("notAssigned", "Nicht zugewiesen"))}</span>
         </div>
       </div>
 
@@ -193,13 +205,13 @@ const CustomerService = (() => {
 
       <div class="card-actions">
         <button class="action-button edit-button" type="button" data-action="detail" data-id="${customer.id}">
-          Akte öffnen
+          ${translate("actionOpenFile", "Akte öffnen")}
         </button>
 
         ${UIService.createActionLinks(customer)}
 
         <button class="action-button report-button" type="button" data-action="report" data-id="${customer.id}">
-          Servicebericht
+          ${translate("actionReport", "Servicebericht")}
         </button>
       </div>
 
@@ -207,13 +219,13 @@ const CustomerService = (() => {
 
       <div class="card-actions">
         <button class="action-button edit-button" type="button" data-action="edit" data-id="${customer.id}">
-          Bearbeiten
+          ${translate("actionEdit", "Bearbeiten")}
         </button>
 
         ${
           customer.status !== "done"
             ? `<button class="action-button done-button" type="button" data-action="done" data-id="${customer.id}">
-                Als erledigt markieren
+                ${translate("actionDone", "Als erledigt markieren")}
               </button>`
             : ""
         }
@@ -221,7 +233,7 @@ const CustomerService = (() => {
         ${
           AuthService.isAdmin()
             ? `<button class="action-button delete-button" type="button" data-action="delete" data-id="${customer.id}">
-                Löschen
+                ${translate("actionDelete", "Löschen")}
               </button>`
             : ""
         }
@@ -245,6 +257,24 @@ const CustomerService = (() => {
     renderBoardColumn("boardOpenList", openCustomers);
     renderBoardColumn("boardProgressList", progressCustomers);
     renderBoardColumn("boardDoneList", doneCustomers);
+
+    setBoardColumnTitles();
+  }
+
+  function setBoardColumnTitles() {
+    const columns = document.querySelectorAll(".board-column-header h3");
+
+    if (columns[0]) {
+      columns[0].textContent = translate("boardOpen", "Offen");
+    }
+
+    if (columns[1]) {
+      columns[1].textContent = translate("boardProgress", "In Bearbeitung");
+    }
+
+    if (columns[2]) {
+      columns[2].textContent = translate("boardDone", "Erledigt");
+    }
   }
 
   function renderBoardColumn(elementId, customers) {
@@ -257,7 +287,7 @@ const CustomerService = (() => {
     list.innerHTML = "";
 
     if (customers.length === 0) {
-      list.innerHTML = `<p class="board-empty">Keine Servicefälle in dieser Spalte.</p>`;
+      list.innerHTML = `<p class="board-empty">${translate("boardEmpty", "Keine Servicefälle in dieser Spalte.")}</p>`;
       return;
     }
 
@@ -273,19 +303,19 @@ const CustomerService = (() => {
     card.innerHTML = `
       <h4>${ReportService.escapeHtml(customer.name)}</h4>
 
-      <p>${ReportService.escapeHtml(customer.city || "Ort nicht angegeben")}</p>
-      <p>${ReportService.escapeHtml(customer.serviceType || "Servicefall")} · ${ReminderService.getPriorityLabel(customer.priority)}</p>
-      <p>Termin: ${customer.nextDate ? ReminderService.formatDate(customer.nextDate) : "Noch offen"}</p>
-      <p>Techniker: ${ReportService.escapeHtml(customer.assignedTo || "Nicht zugewiesen")}</p>
-      <p>Maschine: ${ReportService.escapeHtml(customer.machineType || "Nicht angegeben")}</p>
+      <p>${ReportService.escapeHtml(customer.city || translate("locationOpen", "Ort offen"))}</p>
+      <p>${ReportService.escapeHtml(ReminderService.translateStoredServiceType(customer.serviceType) || translate("serviceCase", "Servicefall"))} · ${ReminderService.getPriorityLabel(customer.priority)}</p>
+      <p>${translate("labelAppointment", "Termin")}: ${customer.nextDate ? ReminderService.formatDate(customer.nextDate) : translate("noDateOpen", "Noch offen")}</p>
+      <p>${translate("labelTechnician", "Techniker")}: ${ReportService.escapeHtml(customer.assignedTo || translate("notAssigned", "Nicht zugewiesen"))}</p>
+      <p>${translate("labelMachineType", "Maschinentyp")}: ${ReportService.escapeHtml(customer.machineType || translate("notSpecified", "Nicht angegeben"))}</p>
 
       <div class="board-card-actions">
         <button class="action-button edit-button" type="button" data-action="detail" data-id="${customer.id}">
-          Öffnen
+          ${translate("actionOpen", "Öffnen")}
         </button>
 
         <button class="action-button report-button" type="button" data-action="report" data-id="${customer.id}">
-          Bericht
+          ${translate("actionReportShort", "Bericht")}
         </button>
       </div>
     `;
@@ -315,7 +345,7 @@ const CustomerService = (() => {
     list.innerHTML = "";
 
     if (customers.length === 0) {
-      list.innerHTML = `<p class="empty">Aktuell sind keine Erinnerungen oder dringenden Fälle fällig.</p>`;
+      list.innerHTML = `<p class="empty">${translate("importantEmpty", "Aktuell sind keine Erinnerungen oder dringenden Fälle fällig.")}</p>`;
       return;
     }
 
@@ -324,24 +354,24 @@ const CustomerService = (() => {
       item.className = "important-item";
 
       const reminderInfo = ReminderService.getReminderInfo(customer);
-      const message = reminderInfo.text || "Dringender Servicefall ohne Erinnerung.";
+      const message = reminderInfo.text || translate("priorityUrgent", "Dringend");
 
       item.innerHTML = `
         <div>
           <h3>${ReportService.escapeHtml(customer.name)}</h3>
           <p>${ReportService.escapeHtml(message)}</p>
           <p>
-            ${ReportService.escapeHtml(customer.city || "Ort nicht angegeben")}
-            ${customer.nextDate ? " · Termin: " + ReminderService.formatDate(customer.nextDate) : ""}
+            ${ReportService.escapeHtml(customer.city || translate("locationOpen", "Ort offen"))}
+            ${customer.nextDate ? " · " + translate("labelAppointment", "Termin") + ": " + ReminderService.formatDate(customer.nextDate) : ""}
           </p>
-          <p>Zugewiesen an: ${ReportService.escapeHtml(customer.assignedTo || "Nicht zugewiesen")}</p>
+          <p>${translate("labelAssignedTo", "Zugewiesen an")}: ${ReportService.escapeHtml(customer.assignedTo || translate("notAssigned", "Nicht zugewiesen"))}</p>
         </div>
 
         <div class="important-actions">
           ${UIService.createActionLinks(customer)}
 
           <button class="action-button edit-button" type="button" data-action="detail" data-id="${customer.id}">
-            Akte öffnen
+            ${translate("actionOpenFile", "Akte öffnen")}
           </button>
         </div>
       `;
@@ -364,7 +394,7 @@ const CustomerService = (() => {
     reportsList.innerHTML = "";
 
     if (doneCustomers.length === 0) {
-      reportsList.innerHTML = `<p class="empty">Noch keine erledigten Servicefälle vorhanden.</p>`;
+      reportsList.innerHTML = `<p class="empty">${translate("reportsNoCompleted", "Noch keine erledigten Servicefälle vorhanden.")}</p>`;
       return;
     }
 
@@ -377,23 +407,23 @@ const CustomerService = (() => {
           <div>
             <h3>${ReportService.escapeHtml(customer.name)}</h3>
             <p>
-              ${ReportService.escapeHtml(customer.serviceType || "Servicefall")}
-              · ${ReportService.escapeHtml(customer.city || "Ort nicht angegeben")}
+              ${ReportService.escapeHtml(ReminderService.translateStoredServiceType(customer.serviceType) || translate("serviceCase", "Servicefall"))}
+              · ${ReportService.escapeHtml(customer.city || translate("locationOpen", "Ort offen"))}
             </p>
           </div>
 
           <div class="badges">
-            <span class="badge badge-green">Erledigt</span>
-            <span class="badge badge-gold">${ReportService.escapeHtml(customer.assignedTo || "Nicht zugewiesen")}</span>
+            <span class="badge badge-green">${ReminderService.getStatusLabel("done")}</span>
+            <span class="badge badge-gold">${ReportService.escapeHtml(customer.assignedTo || translate("notAssigned", "Nicht zugewiesen"))}</span>
           </div>
         </div>
 
-        <p><strong>Erledigt am:</strong> ${formatDateTime(customer.completedAt)}</p>
-        <p><strong>Notiz:</strong> ${ReportService.escapeHtml(customer.note || "Keine Notiz vorhanden.")}</p>
+        <p><strong>${translate("labelCompletedAt", "Erledigt am")}:</strong> ${formatDateTime(customer.completedAt)}</p>
+        <p><strong>${translate("labelNote", "Notiz")}:</strong> ${ReportService.escapeHtml(customer.note || translate("noNote", "Keine Notiz vorhanden."))}</p>
 
         <div class="card-actions">
           <button class="action-button report-button" type="button" data-action="report" data-id="${customer.id}">
-            Servicebericht öffnen
+            ${translate("actionReport", "Servicebericht")}
           </button>
         </div>
       `;
@@ -406,7 +436,7 @@ const CustomerService = (() => {
     const customer = findCustomerById(customerId);
 
     if (!customer) {
-      UIService.showToast("Servicefall wurde nicht gefunden.");
+      UIService.showToast(translate("toastCustomerNotFound", "Servicefall wurde nicht gefunden."));
       return;
     }
 
@@ -420,7 +450,7 @@ const CustomerService = (() => {
     const reminderHtml = reminderInfo.text
       ? `
         <div class="detail-section">
-          <h3>Erinnerung</h3>
+          <h3>${translate("labelReminder", "Erinnerung")}</h3>
           <div class="reminder-box ${reminderInfo.className}">
             ${ReportService.escapeHtml(reminderInfo.text)}
           </div>
@@ -431,7 +461,7 @@ const CustomerService = (() => {
     const imageHtml = customer.image
       ? `
         <div class="detail-section">
-          <h3>Bild / Dokumentation</h3>
+          <h3>${translate("labelImageDocumentation", "Bild / Dokumentation")}</h3>
           <img class="service-image" src="${customer.image}" alt="Servicebild" />
         </div>
       `
@@ -439,47 +469,47 @@ const CustomerService = (() => {
 
     return `
       <div class="detail-grid">
-        ${createDetailBox("Kunde", customer.name)}
-        ${createDetailBox("Ort", customer.city)}
-        ${createDetailBox("Adresse", customer.address)}
-        ${createDetailBox("Telefon", customer.phone)}
-        ${createDetailBox("E-Mail", customer.email)}
-        ${createDetailBox("Anlage", customer.system)}
-        ${createDetailBox("Maschinentyp", customer.machineType)}
-        ${createDetailBox("Bahnanzahl", customer.laneCount)}
-        ${createDetailBox("Wartung pro Bahn", customer.maintenancePerLane)}
-        ${createDetailBox("Serviceart", customer.serviceType)}
-        ${createDetailBox("Status", ReminderService.getStatusLabel(customer.status))}
-        ${createDetailBox("Priorität", ReminderService.getPriorityLabel(customer.priority))}
-        ${createDetailBox("Zugewiesen an", customer.assignedTo || "Nicht zugewiesen")}
-        ${createDetailBox("Nächster Termin", customer.nextDate ? ReminderService.formatDate(customer.nextDate) : "Noch offen")}
-        ${createDetailBox("Erstellt von", customer.createdBy || "Unbekannt")}
+        ${createDetailBox(translate("labelCustomer", "Kunde"), customer.name)}
+        ${createDetailBox(translate("labelCity", "Ort"), customer.city)}
+        ${createDetailBox(translate("labelAddress", "Adresse"), customer.address)}
+        ${createDetailBox(translate("labelPhone", "Telefon"), customer.phone)}
+        ${createDetailBox(translate("labelEmail", "E-Mail"), customer.email)}
+        ${createDetailBox(translate("labelSystem", "Anlage"), ReminderService.translateStoredSystem(customer.system))}
+        ${createDetailBox(translate("labelMachineType", "Maschinentyp"), customer.machineType)}
+        ${createDetailBox(translate("labelLanes", "Bahnanzahl"), customer.laneCount)}
+        ${createDetailBox(translate("labelMaintenancePerLane", "Wartung pro Bahn"), customer.maintenancePerLane)}
+        ${createDetailBox(translate("labelServiceType", "Serviceart"), ReminderService.translateStoredServiceType(customer.serviceType))}
+        ${createDetailBox(translate("labelStatus", "Status"), ReminderService.getStatusLabel(customer.status))}
+        ${createDetailBox(translate("labelPriority", "Priorität"), ReminderService.getPriorityLabel(customer.priority))}
+        ${createDetailBox(translate("labelAssignedTo", "Zugewiesen an"), customer.assignedTo || translate("notAssigned", "Nicht zugewiesen"))}
+        ${createDetailBox(translate("labelNextDate", "Nächster Termin"), customer.nextDate ? ReminderService.formatDate(customer.nextDate) : translate("noDateOpen", "Noch offen"))}
+        ${createDetailBox(translate("labelCreatedBy", "Erstellt von"), customer.createdBy || translate("unknown", "Unbekannt"))}
       </div>
 
       <div class="detail-section">
-        <h3>Notiz</h3>
-        <p class="muted-text">${ReportService.escapeHtml(customer.note || "Keine Notiz vorhanden.")}</p>
+        <h3>${translate("labelNote", "Notiz")}</h3>
+        <p class="muted-text">${ReportService.escapeHtml(customer.note || translate("noNote", "Keine Notiz vorhanden."))}</p>
       </div>
 
       ${reminderHtml}
 
       <div class="detail-section">
-        <h3>Serviceverlauf</h3>
+        <h3>${translate("labelServiceHistory", "Serviceverlauf")}</h3>
 
         <div class="timeline">
           <div class="timeline-item">
-            <h4>Eintrag angelegt</h4>
+            <h4>${translate("entryCreated", "Eintrag angelegt")}</h4>
             <p>${formatDateTime(customer.createdAt)}</p>
-            <p>Erstellt von: ${ReportService.escapeHtml(customer.createdBy || "Unbekannt")}</p>
+            <p>${translate("labelCreatedBy", "Erstellt von")}: ${ReportService.escapeHtml(customer.createdBy || translate("unknown", "Unbekannt"))}</p>
           </div>
 
           ${
             customer.updatedAt
               ? `
                 <div class="timeline-item">
-                  <h4>Eintrag bearbeitet</h4>
+                  <h4>${translate("entryEdited", "Eintrag bearbeitet")}</h4>
                   <p>${formatDateTime(customer.updatedAt)}</p>
-                  <p>Bearbeitet von: ${ReportService.escapeHtml(customer.updatedBy || "Unbekannt")}</p>
+                  <p>${translate("editedBy", "Bearbeitet von")}: ${ReportService.escapeHtml(customer.updatedBy || translate("unknown", "Unbekannt"))}</p>
                 </div>
               `
               : ""
@@ -489,9 +519,9 @@ const CustomerService = (() => {
             customer.status === "done"
               ? `
                 <div class="timeline-item">
-                  <h4>Servicefall erledigt</h4>
+                  <h4>${translate("caseCompleted", "Servicefall erledigt")}</h4>
                   <p>${formatDateTime(customer.completedAt)}</p>
-                  <p>Erledigt von: ${ReportService.escapeHtml(customer.updatedBy || "Unbekannt")}</p>
+                  <p>${translate("completedBy", "Erledigt von")}: ${ReportService.escapeHtml(customer.updatedBy || translate("unknown", "Unbekannt"))}</p>
                 </div>
               `
               : ""
@@ -505,17 +535,17 @@ const CustomerService = (() => {
         ${UIService.createActionLinks(customer)}
 
         <button class="action-button edit-button" type="button" data-action="edit" data-id="${customer.id}">
-          Bearbeiten
+          ${translate("actionEdit", "Bearbeiten")}
         </button>
 
         <button class="action-button report-button" type="button" data-action="report" data-id="${customer.id}">
-          Servicebericht öffnen
+          ${translate("actionReport", "Servicebericht")}
         </button>
 
         ${
           customer.status !== "done"
             ? `<button class="action-button done-button" type="button" data-action="done" data-id="${customer.id}">
-                Als erledigt markieren
+                ${translate("actionDone", "Als erledigt markieren")}
               </button>`
             : ""
         }
@@ -527,7 +557,7 @@ const CustomerService = (() => {
     return `
       <div class="detail-box">
         <strong>${ReportService.escapeHtml(label)}</strong>
-        <span>${ReportService.escapeHtml(value || "Nicht angegeben")}</span>
+        <span>${ReportService.escapeHtml(value || translate("notSpecified", "Nicht angegeben"))}</span>
       </div>
     `;
   }
@@ -536,7 +566,7 @@ const CustomerService = (() => {
     const customer = findCustomerById(customerId);
 
     if (!customer) {
-      UIService.showToast("Servicefall wurde nicht gefunden.");
+      UIService.showToast(translate("toastCustomerNotFound", "Servicefall wurde nicht gefunden."));
       return;
     }
 
@@ -561,6 +591,10 @@ const CustomerService = (() => {
     UIService.setValue("editReminderDate", customer.reminderDate);
     UIService.setValue("editNote", customer.note);
 
+    if (typeof I18nService !== "undefined") {
+      I18nService.applyLanguage();
+    }
+
     UIService.openModal("editCustomerModal");
   }
 
@@ -568,7 +602,7 @@ const CustomerService = (() => {
     const customerId = UIService.getRawValue("editCustomerId");
 
     if (!customerId) {
-      UIService.showToast("Kein Servicefall ausgewählt.");
+      UIService.showToast(translate("toastCustomerNotFound", "Servicefall wurde nicht gefunden."));
       return;
     }
 
@@ -596,7 +630,7 @@ const CustomerService = (() => {
     };
 
     if (!updates.name) {
-      UIService.showToast("Bitte mindestens einen Kundennamen eintragen.");
+      UIService.showToast(translate("toastCustomerMissing", "Bitte mindestens einen Kundennamen eintragen."));
       return;
     }
 
@@ -613,7 +647,7 @@ const CustomerService = (() => {
     UIService.closeModal("editCustomerModal");
 
     renderAll();
-    UIService.showToast("Änderungen wurden gespeichert.");
+    UIService.showToast(translate("toastChangesSaved", "Änderungen wurden gespeichert."));
   }
 
   function markAsDone(customerId) {
@@ -624,16 +658,16 @@ const CustomerService = (() => {
     });
 
     renderAll();
-    UIService.showToast("Servicefall wurde als erledigt markiert.");
+    UIService.showToast(translate("toastCaseDone", "Servicefall wurde als erledigt markiert."));
   }
 
   function deleteCustomer(customerId) {
     if (!AuthService.isAdmin()) {
-      UIService.showToast("Nur Admins dürfen Einträge löschen.");
+      UIService.showToast(translate("toastOnlyAdminsDelete", "Nur Admins dürfen Einträge löschen."));
       return;
     }
 
-    const confirmed = confirm("Soll dieser Servicefall wirklich gelöscht werden?");
+    const confirmed = confirm(translate("confirmDelete", "Soll dieser Servicefall wirklich gelöscht werden?"));
 
     if (!confirmed) {
       return;
@@ -642,14 +676,14 @@ const CustomerService = (() => {
     StorageService.deleteCustomer(customerId);
 
     renderAll();
-    UIService.showToast("Eintrag wurde gelöscht.");
+    UIService.showToast(translate("toastDeleted", "Eintrag wurde gelöscht."));
   }
 
   function openReport(customerId) {
     const customer = findCustomerById(customerId);
 
     if (!customer) {
-      UIService.showToast("Servicefall wurde nicht gefunden.");
+      UIService.showToast(translate("toastCustomerNotFound", "Servicefall wurde nicht gefunden."));
       return;
     }
 
@@ -703,16 +737,38 @@ const CustomerService = (() => {
 
   function formatDateTime(dateString) {
     if (!dateString) {
-      return "Nicht angegeben";
+      return translate("notSpecified", "Nicht angegeben");
     }
 
     const date = new Date(dateString);
 
     if (Number.isNaN(date.getTime())) {
-      return "Nicht angegeben";
+      return translate("notSpecified", "Nicht angegeben");
     }
 
-    return date.toLocaleString("de-DE");
+    return date.toLocaleString(getLocale());
+  }
+
+  function getLocale() {
+    if (typeof I18nService === "undefined") {
+      return "de-DE";
+    }
+
+    return I18nService.getLanguage() === "en" ? "en-GB" : "de-DE";
+  }
+
+  function translate(key, fallback, replacements = {}) {
+    if (typeof I18nService === "undefined") {
+      let text = fallback;
+
+      Object.entries(replacements).forEach(([placeholder, value]) => {
+        text = text.replaceAll(`{${placeholder}}`, value);
+      });
+
+      return text;
+    }
+
+    return I18nService.t(key, replacements);
   }
 
   return {

@@ -23,7 +23,7 @@ const CalendarService = (() => {
     card.className = "calendar-day";
 
     const entriesHtml = customers.length === 0
-      ? `<p class="muted-text">Keine Termine vorhanden.</p>`
+      ? `<p class="muted-text">${translate("calendarNoEntries", "Keine Termine vorhanden.")}</p>`
       : customers
           .sort((a, b) => sortByPriority(a, b))
           .map(customer => createCalendarEntry(customer))
@@ -44,11 +44,11 @@ const CalendarService = (() => {
       <div class="calendar-entry ${priorityClass}">
         <strong>${ReportService.escapeHtml(customer.name)}</strong>
 
-        <p>${ReportService.escapeHtml(customer.city || "Ort offen")}</p>
-        <p>${ReportService.escapeHtml(customer.serviceType || "Servicefall")}</p>
-        <p>Techniker: ${ReportService.escapeHtml(customer.assignedTo || "Nicht zugewiesen")}</p>
-        <p>Status: ${ReminderService.getStatusLabel(customer.status)}</p>
-        <p>Priorität: ${ReminderService.getPriorityLabel(customer.priority)}</p>
+        <p>${ReportService.escapeHtml(customer.city || translate("locationOpen", "Ort offen"))}</p>
+        <p>${ReportService.escapeHtml(ReminderService.translateStoredServiceType(customer.serviceType) || translate("serviceCase", "Servicefall"))}</p>
+        <p>${translate("labelTechnician", "Techniker")}: ${ReportService.escapeHtml(customer.assignedTo || translate("notAssigned", "Nicht zugewiesen"))}</p>
+        <p>${translate("labelStatus", "Status")}: ${ReminderService.getStatusLabel(customer.status)}</p>
+        <p>${translate("labelPriority", "Priorität")}: ${ReminderService.getPriorityLabel(customer.priority)}</p>
 
         <div class="card-actions">
           <button
@@ -56,7 +56,7 @@ const CalendarService = (() => {
             type="button"
             data-calendar-open="${customer.id}"
           >
-            Öffnen
+            ${translate("actionOpen", "Öffnen")}
           </button>
         </div>
       </div>
@@ -99,10 +99,10 @@ const CalendarService = (() => {
     const date = new Date(dateString);
 
     if (Number.isNaN(date.getTime())) {
-      return "Datum offen";
+      return translate("noDateOpen", "Noch offen");
     }
 
-    return date.toLocaleDateString("de-DE", {
+    return date.toLocaleDateString(getLocale(), {
       weekday: "long",
       day: "2-digit",
       month: "2-digit"
@@ -117,6 +117,28 @@ const CalendarService = (() => {
     };
 
     return (order[a.priority] ?? 3) - (order[b.priority] ?? 3);
+  }
+
+  function getLocale() {
+    if (typeof I18nService === "undefined") {
+      return "de-DE";
+    }
+
+    return I18nService.getLanguage() === "en" ? "en-GB" : "de-DE";
+  }
+
+  function translate(key, fallback, replacements = {}) {
+    if (typeof I18nService === "undefined") {
+      let text = fallback;
+
+      Object.entries(replacements).forEach(([placeholder, value]) => {
+        text = text.replaceAll(`{${placeholder}}`, value);
+      });
+
+      return text;
+    }
+
+    return I18nService.t(key, replacements);
   }
 
   return {

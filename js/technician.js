@@ -36,7 +36,7 @@ const TechnicianService = (() => {
     routeContainer.innerHTML = "";
 
     if (todayCustomers.length === 0) {
-      routeContainer.innerHTML = `<p class="empty">Heute sind keine Einsätze geplant.</p>`;
+      routeContainer.innerHTML = `<p class="empty">${translate("technicianRouteEmpty", "Heute sind keine Einsätze geplant.")}</p>`;
       return;
     }
 
@@ -49,7 +49,7 @@ const TechnicianService = (() => {
 
         <div class="route-content">
           <h3>${ReportService.escapeHtml(customer.name)}</h3>
-          <p>${ReportService.escapeHtml(customer.address || "Adresse offen")}</p>
+          <p>${ReportService.escapeHtml(customer.address || translate("addressOpen", "Adresse offen"))}</p>
           <p>${ReportService.escapeHtml(customer.city || "")}</p>
 
           <div class="card-actions">
@@ -60,7 +60,7 @@ const TechnicianService = (() => {
               type="button"
               data-technician-detail="${customer.id}"
             >
-              Akte
+              ${translate("actionOpenFile", "Akte öffnen")}
             </button>
 
             <button
@@ -68,7 +68,7 @@ const TechnicianService = (() => {
               type="button"
               data-technician-done="${customer.id}"
             >
-              Erledigt
+              ${translate("actionDone", "Als erledigt markieren")}
             </button>
           </div>
         </div>
@@ -92,7 +92,7 @@ const TechnicianService = (() => {
     container.innerHTML = "";
 
     if (upcomingCustomers.length === 0) {
-      container.innerHTML = `<p class="empty">Aktuell sind keine offenen Einsätze zugewiesen.</p>`;
+      container.innerHTML = `<p class="empty">${translate("technicianUpcomingEmpty", "Aktuell sind keine offenen Einsätze zugewiesen.")}</p>`;
       return;
     }
 
@@ -104,7 +104,7 @@ const TechnicianService = (() => {
         <div class="technician-upcoming-top">
           <div>
             <h3>${ReportService.escapeHtml(customer.name)}</h3>
-            <p>${ReportService.escapeHtml(customer.city || "Ort offen")}</p>
+            <p>${ReportService.escapeHtml(customer.city || translate("locationOpen", "Ort offen"))}</p>
           </div>
 
           <span class="badge ${ReminderService.getPriorityBadgeClass(customer.priority)}">
@@ -114,23 +114,23 @@ const TechnicianService = (() => {
 
         <div class="technician-upcoming-grid">
           <div>
-            <strong>Termin</strong>
+            <strong>${translate("labelAppointment", "Termin")}</strong>
             <span>${ReminderService.formatDate(customer.nextDate)}</span>
           </div>
 
           <div>
-            <strong>Status</strong>
+            <strong>${translate("labelStatus", "Status")}</strong>
             <span>${ReminderService.getStatusLabel(customer.status)}</span>
           </div>
 
           <div>
-            <strong>Maschine</strong>
-            <span>${ReportService.escapeHtml(customer.machineType || "Nicht angegeben")}</span>
+            <strong>${translate("labelMachineType", "Maschinentyp")}</strong>
+            <span>${ReportService.escapeHtml(customer.machineType || translate("notSpecified", "Nicht angegeben"))}</span>
           </div>
 
           <div>
-            <strong>Bahnen</strong>
-            <span>${ReportService.escapeHtml(customer.laneCount || "Nicht angegeben")}</span>
+            <strong>${translate("labelLanes", "Bahnanzahl")}</strong>
+            <span>${ReportService.escapeHtml(customer.laneCount || translate("notSpecified", "Nicht angegeben"))}</span>
           </div>
         </div>
 
@@ -142,7 +142,7 @@ const TechnicianService = (() => {
             type="button"
             data-technician-detail="${customer.id}"
           >
-            Akte
+            ${translate("actionOpenFile", "Akte öffnen")}
           </button>
         </div>
       `;
@@ -189,6 +189,20 @@ const TechnicianService = (() => {
     };
 
     return (order[a.priority] ?? 3) - (order[b.priority] ?? 3);
+  }
+
+  function translate(key, fallback, replacements = {}) {
+    if (typeof I18nService === "undefined") {
+      let text = fallback;
+
+      Object.entries(replacements).forEach(([placeholder, value]) => {
+        text = text.replaceAll(`{${placeholder}}`, value);
+      });
+
+      return text;
+    }
+
+    return I18nService.t(key, replacements);
   }
 
   return {

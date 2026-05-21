@@ -178,6 +178,10 @@ const UIService = (() => {
 
       select.appendChild(optionElement);
     });
+
+    if (typeof I18nService !== "undefined") {
+      I18nService.applyLanguage();
+    }
   }
 
   function applyTheme(theme) {
@@ -195,7 +199,11 @@ const UIService = (() => {
     applyTheme(newTheme);
     StorageService.saveTheme(newTheme);
 
-    showToast(newTheme === "dark" ? "Dunkler Modus aktiviert." : "Heller Modus aktiviert.");
+    const message = newTheme === "dark"
+      ? translate("toastDark", "Dunkler Modus aktiviert.")
+      : translate("toastLight", "Heller Modus aktiviert.");
+
+    showToast(message);
   }
 
   function createActionLinks(customer) {
@@ -205,12 +213,16 @@ const UIService = (() => {
     const city = customer.city || "";
     const routeAddress = encodeURIComponent(`${address} ${city}`.trim());
 
+    const phoneLabel = translate("actionCall", "Anrufen");
+    const mailLabel = translate("actionEmail", "E-Mail");
+    const routeLabel = translate("actionRoute", "Route");
+
     const phoneLink = phone
-      ? `<a class="action-link call-button" href="tel:${escapeAttribute(phone)}">Anrufen</a>`
+      ? `<a class="action-link call-button" href="tel:${escapeAttribute(phone)}">${phoneLabel}</a>`
       : "";
 
     const mailLink = email
-      ? `<a class="action-link mail-button" href="mailto:${escapeAttribute(email)}">E-Mail</a>`
+      ? `<a class="action-link mail-button" href="mailto:${escapeAttribute(email)}">${mailLabel}</a>`
       : "";
 
     const routeLink = address || city
@@ -221,7 +233,7 @@ const UIService = (() => {
           target="_blank"
           rel="noopener noreferrer"
         >
-          Route
+          ${routeLabel}
         </a>
       `
       : "";
@@ -231,30 +243,46 @@ const UIService = (() => {
 
   function formatDate(dateString) {
     if (!dateString) {
-      return "Nicht angegeben";
+      return translate("notSpecified", "Nicht angegeben");
     }
 
     const date = new Date(dateString);
 
     if (Number.isNaN(date.getTime())) {
-      return "Nicht angegeben";
+      return translate("notSpecified", "Nicht angegeben");
     }
 
-    return date.toLocaleDateString("de-DE");
+    return date.toLocaleDateString(getLocale());
   }
 
   function formatDateTime(dateString) {
     if (!dateString) {
-      return "Nicht angegeben";
+      return translate("notSpecified", "Nicht angegeben");
     }
 
     const date = new Date(dateString);
 
     if (Number.isNaN(date.getTime())) {
-      return "Nicht angegeben";
+      return translate("notSpecified", "Nicht angegeben");
     }
 
-    return date.toLocaleString("de-DE");
+    return date.toLocaleString(getLocale());
+  }
+
+  function getLocale() {
+    if (typeof I18nService === "undefined") {
+      return "de-DE";
+    }
+
+    return I18nService.getLanguage() === "en" ? "en-GB" : "de-DE";
+  }
+
+  function translate(key, fallback) {
+    if (typeof I18nService === "undefined") {
+      return fallback;
+    }
+
+    return I18nService.t(key);
   }
 
   function escapeAttribute(value) {

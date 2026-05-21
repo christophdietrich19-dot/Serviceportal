@@ -71,7 +71,25 @@ const DragDropService = (() => {
 
     CustomerService.renderAll();
 
-    UIService.showToast(`Status geändert: ${ReminderService.getStatusLabel(newStatus)}`);
+    UIService.showToast(
+      translate("toastStatusChanged", "Status geändert: {status}", {
+        status: ReminderService.getStatusLabel(newStatus)
+      })
+    );
+  }
+
+  function translate(key, fallback, replacements = {}) {
+    if (typeof I18nService === "undefined") {
+      let text = fallback;
+
+      Object.entries(replacements).forEach(([placeholder, value]) => {
+        text = text.replaceAll(`{${placeholder}}`, value);
+      });
+
+      return text;
+    }
+
+    return I18nService.t(key, replacements);
   }
 
   return {

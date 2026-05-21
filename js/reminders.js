@@ -1,12 +1,12 @@
 const ReminderService = (() => {
   function getStatusLabel(status) {
     const labels = {
-      open: "Offen",
-      progress: "In Bearbeitung",
-      done: "Erledigt"
+      open: translate("statusOpen", "Offen"),
+      progress: translate("statusProgress", "In Bearbeitung"),
+      done: translate("statusDone", "Erledigt")
     };
 
-    return labels[status] || "Offen";
+    return labels[status] || labels.open;
   }
 
   function getStatusBadgeClass(status) {
@@ -21,12 +21,12 @@ const ReminderService = (() => {
 
   function getPriorityLabel(priority) {
     const labels = {
-      normal: "Normal",
-      high: "Hoch",
-      urgent: "Dringend"
+      normal: translate("priorityNormal", "Normal"),
+      high: translate("priorityHigh", "Hoch"),
+      urgent: translate("priorityUrgent", "Dringend")
     };
 
-    return labels[priority] || "Normal";
+    return labels[priority] || labels.normal;
   }
 
   function getPriorityClass(priority) {
@@ -75,30 +75,42 @@ const ReminderService = (() => {
     const today = getDateOnly(new Date());
     const reminderDate = getDateOnly(customer.reminderDate);
     const diffDays = getDayDifference(today, reminderDate);
+    const reminderType = translateStoredReminderType(customer.reminderType);
 
     if (diffDays < 0) {
       return {
-        text: `${customer.reminderType} ist seit ${Math.abs(diffDays)} Tag(en) überfällig.`,
+        text: translate("reminderOverdue", "{type} ist seit {days} Tag(en) überfällig.", {
+          type: reminderType,
+          days: Math.abs(diffDays)
+        }),
         className: "reminder-overdue"
       };
     }
 
     if (diffDays === 0) {
       return {
-        text: `${customer.reminderType} ist heute fällig.`,
+        text: translate("reminderToday", "{type} ist heute fällig.", {
+          type: reminderType
+        }),
         className: "reminder-today"
       };
     }
 
     if (diffDays <= 3) {
       return {
-        text: `${customer.reminderType} in ${diffDays} Tag(en).`,
+        text: translate("reminderSoon", "{type} in {days} Tag(en).", {
+          type: reminderType,
+          days: diffDays
+        }),
         className: "reminder-soon"
       };
     }
 
     return {
-      text: `${customer.reminderType} am ${formatDate(customer.reminderDate)}.`,
+      text: translate("reminderDate", "{type} am {date}.", {
+        type: reminderType,
+        date: formatDate(customer.reminderDate)
+      }),
       className: "reminder-normal"
     };
   }
@@ -201,13 +213,19 @@ const ReminderService = (() => {
       ${customer.phone || ""}
       ${customer.email || ""}
       ${customer.system || ""}
+      ${translateStoredSystem(customer.system) || ""}
       ${customer.machineType || ""}
       ${customer.laneCount || ""}
       ${customer.maintenancePerLane || ""}
       ${customer.serviceType || ""}
+      ${translateStoredServiceType(customer.serviceType) || ""}
       ${customer.priority || ""}
+      ${getPriorityLabel(customer.priority) || ""}
       ${customer.status || ""}
+      ${getStatusLabel(customer.status) || ""}
       ${customer.assignedTo || ""}
+      ${customer.reminderType || ""}
+      ${translateStoredReminderType(customer.reminderType) || ""}
       ${customer.note || ""}
     `.toLowerCase();
 
@@ -216,16 +234,16 @@ const ReminderService = (() => {
 
   function formatDate(dateString) {
     if (!dateString) {
-      return "Nicht angegeben";
+      return translate("notSpecified", "Nicht angegeben");
     }
 
     const date = new Date(dateString);
 
     if (Number.isNaN(date.getTime())) {
-      return "Nicht angegeben";
+      return translate("notSpecified", "Nicht angegeben");
     }
 
-    return date.toLocaleDateString("de-DE");
+    return date.toLocaleDateString(getLocale());
   }
 
   function getDateOnly(value) {
@@ -238,6 +256,62 @@ const ReminderService = (() => {
     const millisecondsPerDay = 1000 * 60 * 60 * 24;
 
     return Math.ceil((targetDate - startDate) / millisecondsPerDay);
+  }
+
+  function translateStoredSystem(value) {
+    const map = {
+      "Bowlingbahn": "systemBowling",
+      "Kegelbahn": "systemSkittles",
+      "Bowling- und Kegelbahn": "systemBoth"
+    };
+
+    return map[value] ? translate(map[value], value) : value;
+  }
+
+  function translateStoredServiceType(value) {
+    const map = {
+      "Wartung": "serviceMaintenance",
+      "Reparatur": "serviceRepair",
+      "Rückruf": "serviceCallback",
+      "Angebot": "serviceOffer",
+      "Kontrolle": "serviceInspection"
+    };
+
+    return map[value] ? translate(map[value], value) : value;
+  }
+
+  function translateStoredReminderType(value) {
+    const map = {
+      "Kunde anrufen": "reminderCall",
+      "E-Mail schreiben": "reminderEmail",
+      "Wartung fällig": "reminderMaintenance",
+      "Rückmeldung offen": "reminderFeedback",
+      "Termin bestätigen": "reminderConfirm"
+    };
+
+    return map[value] ? translate(map[value], value) : value;
+  }
+
+  function getLocale() {
+    if (typeof I18nService === "undefined") {
+      return "de-DE";
+    }
+
+    return I18nService.getLanguage() === "en" ? "en-GB" : "de-DE";
+  }
+
+  function translate(key, fallback, replacements = {}) {
+    if (typeof I18nService === "undefined") {
+      let text = fallback;
+
+      Object.entries(replacements).forEach(([placeholder, value]) => {
+        text = text.replaceAll(`{${placeholder}}`, value);
+      });
+
+      return text;
+    }
+
+    return I18nService.t(key, replacements);
   }
 
   return {
@@ -262,6 +336,10 @@ const ReminderService = (() => {
     countDueReminders,
 
     matchesSearch,
-    formatDate
+    formatDate,
+
+    translateStoredSystem,
+    translateStoredServiceType,
+    translateStoredReminderType
   };
 })();

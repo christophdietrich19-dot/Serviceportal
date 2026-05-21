@@ -11,7 +11,7 @@ const AuthService = (() => {
     if (!user) {
       return {
         success: false,
-        message: "Login fehlgeschlagen. Bitte E-Mail und Passwort prüfen."
+        message: translate("toastLoginFailed", "Login fehlgeschlagen. Bitte E-Mail und Passwort prüfen.")
       };
     }
 
@@ -40,30 +40,30 @@ const AuthService = (() => {
   }
 
   function getCurrentUserName() {
-    return currentUser ? currentUser.name : "Unbekannt";
+    return currentUser ? currentUser.name : translate("unknown", "Unbekannt");
   }
 
   function getRoleLabel(role) {
     const labels = {
-      admin: "Admin",
-      employee: "Mitarbeiter"
+      admin: translate("roleAdmin", "Admin"),
+      employee: translate("roleEmployee", "Mitarbeiter")
     };
 
-    return labels[role] || "Mitarbeiter";
+    return labels[role] || translate("roleEmployee", "Mitarbeiter");
   }
 
   function createAccount({ name, email, password, role }) {
     if (!isAdmin()) {
       return {
         success: false,
-        message: "Nur Admins dürfen Mitarbeiterkonten anlegen."
+        message: translate("toastOnlyAdminsAccounts", "Nur Admins dürfen Mitarbeiterkonten anlegen.")
       };
     }
 
     if (!name || !email || !password) {
       return {
         success: false,
-        message: "Bitte Name, E-Mail und Passwort ausfüllen."
+        message: translate("toastAccountMissing", "Bitte Name, E-Mail und Passwort ausfüllen.")
       };
     }
 
@@ -76,7 +76,7 @@ const AuthService = (() => {
     if (emailExists) {
       return {
         success: false,
-        message: "Diese E-Mail ist bereits vergeben."
+        message: translate("toastEmailExists", "Diese E-Mail ist bereits vergeben.")
       };
     }
 
@@ -90,7 +90,7 @@ const AuthService = (() => {
     return {
       success: true,
       account,
-      message: "Mitarbeiterkonto wurde angelegt."
+      message: translate("toastAccountCreated", "Mitarbeiterkonto wurde angelegt.")
     };
   }
 
@@ -114,18 +114,38 @@ const AuthService = (() => {
     UIService.setText("menuUserName", currentUser.name);
     UIService.setText("menuUserRole", getRoleLabel(currentUser.role));
 
-    UIService.setText("welcomeTitle", `Willkommen zurück, ${currentUser.name}.`);
+    const welcomeTitle = getLanguage() === "en"
+      ? `Welcome back, ${currentUser.name}.`
+      : `Willkommen zurück, ${currentUser.name}.`;
+
+    UIService.setText("welcomeTitle", welcomeTitle);
 
     if (isAdmin()) {
-      UIService.setText("welcomeText", "Dashboard, Einsätze und Planung werden vorbereitet.");
+      const welcomeText = getLanguage() === "en"
+        ? "Dashboard, jobs and planning are being prepared."
+        : "Dashboard, Einsätze und Planung werden vorbereitet.";
+
+      UIService.setText("welcomeText", welcomeText);
       UIService.showElement("teamAdminPanel");
       UIService.hideElement("teamAccessNotice");
       showAdminLinks();
     } else {
-      UIService.setText("welcomeText", "Deine Einsätze und Erinnerungen werden vorbereitet.");
+      const welcomeText = getLanguage() === "en"
+        ? "Your jobs and reminders are being prepared."
+        : "Deine Einsätze und Erinnerungen werden vorbereitet.";
+
+      UIService.setText("welcomeText", welcomeText);
       UIService.hideElement("teamAdminPanel");
       UIService.showElement("teamAccessNotice");
       hideAdminLinks();
+    }
+
+    if (typeof I18nService !== "undefined") {
+      I18nService.applyLanguage();
+
+      UIService.setText("currentUserRole", getRoleLabel(currentUser.role));
+      UIService.setText("menuUserRole", getRoleLabel(currentUser.role));
+      UIService.setText("welcomeTitle", welcomeTitle);
     }
   }
 
@@ -153,7 +173,7 @@ const AuthService = (() => {
     accountsList.innerHTML = "";
 
     if (accounts.length === 0) {
-      accountsList.innerHTML = `<p class="empty">Noch keine Benutzerkonten angelegt.</p>`;
+      accountsList.innerHTML = `<p class="empty">${translate("notSpecified", "Nicht angegeben")}</p>`;
       return;
     }
 
@@ -164,7 +184,7 @@ const AuthService = (() => {
       card.innerHTML = `
         <strong>${ReportService.escapeHtml(account.name)}</strong>
         <p>${ReportService.escapeHtml(account.email)}</p>
-        <p>Rolle: ${getRoleLabel(account.role)}</p>
+        <p>${translate("roleLabel", "Rolle")}: ${getRoleLabel(account.role)}</p>
       `;
 
       accountsList.appendChild(card);
@@ -175,7 +195,7 @@ const AuthService = (() => {
     const options = [
       {
         value: "",
-        label: "Nicht zugewiesen"
+        label: translate("optionNotAssigned", "Nicht zugewiesen")
       },
       ...getAssignableUsers()
     ];
@@ -185,6 +205,22 @@ const AuthService = (() => {
 
     UIService.populateSelect("assignedTo", options, assignedTo);
     UIService.populateSelect("editAssignedTo", options, editAssignedTo);
+  }
+
+  function getLanguage() {
+    if (typeof I18nService === "undefined") {
+      return "de";
+    }
+
+    return I18nService.getLanguage();
+  }
+
+  function translate(key, fallback) {
+    if (typeof I18nService === "undefined") {
+      return fallback;
+    }
+
+    return I18nService.t(key);
   }
 
   return {

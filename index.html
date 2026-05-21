@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <title>Serviceportal v0.4.1</title>
+  <title>Serviceportal v0.4.2</title>
 
   <link rel="stylesheet" href="css/style.css" />
 </head>
@@ -14,7 +14,7 @@
   <section id="loginView" class="view login-view">
     <div class="login-card">
       <p class="eyebrow">Interner Prototyp</p>
-      <h1>Serviceportal v0.4.1</h1>
+      <h1>Serviceportal v0.4.2</h1>
       <p class="subtitle">Service, Wartung und Einsatzplanung übersichtlich verwalten.</p>
 
       <div class="form login-form">
@@ -79,7 +79,7 @@
         <p>Angemeldet als</p>
         <strong id="menuUserName">Benutzer</strong>
         <span id="menuUserRole">Rolle</span>
-        <span class="app-version">v0.4.1 Präsentationsstand</span>
+        <span class="app-version">v0.4.2 Präsentationsstand</span>
       </div>
     </aside>
 
@@ -89,7 +89,7 @@
 
         <div>
           <p class="eyebrow">Interner Prototyp</p>
-          <h1>Serviceportal v0.4.1</h1>
+          <h1>Serviceportal v0.4.2</h1>
           <p class="subtitle">Service · Wartung · Einsatzplanung</p>
         </div>
       </div>
@@ -99,6 +99,7 @@
         <strong id="currentUserName">Benutzer</strong>
 
         <div class="user-actions">
+          <button id="languageButton" class="small-button" type="button">English</button>
           <button id="themeButton" class="small-button" type="button">Hell / Dunkel</button>
           <button id="logoutButton" class="small-button" type="button">Abmelden</button>
         </div>
@@ -383,7 +384,7 @@
             <textarea id="note" placeholder="Notiz zum Servicefall, zur Wartung oder zur nächsten Rückmeldung"></textarea>
 
             <label class="file-box">
-              Bild zur Reparatur oder Wartung anhängen
+              <span id="fileBoxText">Bild zur Reparatur oder Wartung anhängen</span>
               <input id="serviceImage" type="file" accept="image/*" />
             </label>
 
@@ -493,7 +494,7 @@
           </div>
 
           <p class="muted-text">
-            Aktueller Stand: Präsentationsprototyp v0.4.1
+            Aktueller Stand: Präsentationsprototyp v0.4.2
           </p>
 
           <p class="muted-text">
@@ -505,6 +506,7 @@
           </p>
 
           <div class="settings-actions">
+            <button id="languageButtonSettings" type="button">English</button>
             <button id="themeButtonSettings" type="button">Hell / Dunkel wechseln</button>
             <button id="loadDemoDataButton" type="button">Demo-Daten laden</button>
             <button id="resetDataButton" class="danger-outline-button" type="button">Demo zurücksetzen</button>
@@ -702,6 +704,7 @@
   <script src="js/calendar.js"></script>
   <script src="js/technician.js"></script>
   <script src="js/customers.js"></script>
+  <script src="js/i18n.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>
