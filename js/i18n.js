@@ -16,6 +16,16 @@ const I18nService = (() => {
       welcomeTitle: "Willkommen zurück.",
       welcomeText: "Das Serviceportal wird vorbereitet.",
 
+      updateEyebrow: "Update",
+      updateTitle: "Neu in v0.4.2",
+      updateIntro: "Dieser Präsentationsstand wurde für den nächsten Austausch weiter aufgeräumt und erweitert.",
+      updateItemLanguage: "Deutsch / Englisch Umschaltung direkt ab dem Login",
+      updateItemDashboard: "aufgeräumtes Dashboard und ruhigere Kartenoptik",
+      updateItemMobile: "bessere mobile Darstellung mit App-Gefühl",
+      updateItemSpacing: "bereinigte Abstände und klarere Bedienung",
+      updateItemFuture: "Vorbereitung für spätere Datenbank, Benutzerrechte und produktive Nutzung",
+      updateConfirm: "Verstanden",
+
       navDashboard: "Dashboard",
       navTechnician: "Meine Einsätze",
       navCalendar: "Kalender & Planung",
@@ -302,17 +312,27 @@ const I18nService = (() => {
       navigation: "Navigation",
       presentationVersion: "v0.4.2 Presentation Build",
 
-      loginSubtitle: "Manage service, maintenance and field planning in one clear overview.",
+      loginSubtitle: "Manage service, maintenance, and scheduling in one clear overview.",
       loginButton: "Log in",
       demoHint: "Demo access for testing\nEmail: admin@demo.de\nPassword: admin123",
 
       welcomeEyebrow: "Service Portal",
       welcomeTitle: "Welcome back.",
-      welcomeText: "The service portal is being prepared.",
+      welcomeText: "Preparing the Service Portal.",
+
+      updateEyebrow: "Update",
+      updateTitle: "What’s new in v0.4.2",
+      updateIntro: "This presentation build has been refined and extended for the next project discussion.",
+      updateItemLanguage: "German / English language switch available directly on the login screen",
+      updateItemDashboard: "cleaner dashboard with a calmer card layout",
+      updateItemMobile: "improved mobile layout with an app-like feel",
+      updateItemSpacing: "refined spacing and clearer user guidance",
+      updateItemFuture: "prepared for a future database, user permissions, and live operation",
+      updateConfirm: "Got it",
 
       navDashboard: "Dashboard",
-      navTechnician: "My Jobs",
-      navCalendar: "Calendar & Planning",
+      navTechnician: "My Assignments",
+      navCalendar: "Scheduling",
       navImportant: "Important Today",
       navCustomers: "Customers & Service Cases",
       navNewCustomer: "New Customer / Service Case",
@@ -326,18 +346,18 @@ const I18nService = (() => {
       roleLabel: "Role",
       userLabel: "User",
 
-      topSubtitle: "Service · Maintenance · Field Planning",
+      topSubtitle: "Service · Maintenance · Scheduling",
       languageButton: "Deutsch",
       themeButton: "Light / Dark",
       themeButtonLong: "Switch light / dark mode",
       logoutButton: "Log out",
 
       dashboardEyebrow: "Dashboard",
-      dashboardHeadline: "Current jobs, reminders and service cases at a glance.",
+      dashboardHeadline: "Current assignments, reminders, and service cases at a glance.",
       dashboardMessageDefault: "The most important tasks and open items are shown here.",
       dashboardNoOpenItems: "There are currently no due reminders or urgent cases.",
       dashboardImportantMessage: "Important today: check {due} reminder(s) and {urgent} urgent case(s).",
-      portalBadge: "Service · Maintenance · Planning",
+      portalBadge: "Service · Maintenance · Scheduling",
 
       statCustomers: "Customers",
       statCustomersSub: "Saved customers & systems",
@@ -356,8 +376,8 @@ const I18nService = (() => {
 
       quickEyebrow: "Quick Access",
       quickHeadline: "Frequently used areas",
-      quickTechnician: "Open my jobs",
-      quickCalendar: "Open calendar & planning",
+      quickTechnician: "Open my assignments",
+      quickCalendar: "Open scheduling",
       quickNewCustomer: "Create new customer / service case",
       quickStatusBoard: "Open status board",
       quickCustomers: "Show customers & service cases",
@@ -366,28 +386,28 @@ const I18nService = (() => {
       backDashboard: "← Back to dashboard",
 
       technicianEyebrow: "Technician View",
-      technicianHeadline: "My Jobs",
+      technicianHeadline: "My Assignments",
       technicianIntro: "Assigned open service cases and upcoming appointments are shown here.",
       technicianBadge: "Mobile field view",
       technicianTodayEyebrow: "Today",
-      technicianRouteHeadline: "Today's Route",
-      technicianRouteEmpty: "No jobs are planned for today.",
-      technicianUpcomingEyebrow: "Upcoming Jobs",
+      technicianRouteHeadline: "Today’s Route",
+      technicianRouteEmpty: "No assignments are scheduled for today.",
+      technicianUpcomingEyebrow: "Upcoming Assignments",
       technicianUpcomingHeadline: "Next Appointments",
-      technicianUpcomingEmpty: "There are currently no open jobs assigned to you.",
+      technicianUpcomingEmpty: "There are currently no open assignments assigned to you.",
 
       technicianOpen: "Open",
-      technicianOpenSub: "Jobs",
+      technicianOpenSub: "Assignments",
       technicianProgress: "In Progress",
-      technicianProgressSub: "Jobs",
+      technicianProgressSub: "Assignments",
       technicianUrgent: "Urgent",
-      technicianUrgentSub: "Jobs",
-      technicianDone: "Done",
-      technicianDoneSub: "Jobs",
+      technicianUrgentSub: "Assignments",
+      technicianDone: "Completed",
+      technicianDoneSub: "Assignments",
 
-      calendarEyebrow: "Calendar & Planning",
-      calendarHeadline: "Field Planning",
-      calendarLoading: "Calendar is loading.",
+      calendarEyebrow: "Scheduling",
+      calendarHeadline: "Service Scheduling",
+      calendarLoading: "Loading schedule.",
       calendarNoEntries: "No appointments scheduled.",
 
       customersEyebrow: "Customers & Service Cases",
@@ -403,7 +423,7 @@ const I18nService = (() => {
       statusBoardHeadline: "Service cases by processing status",
       boardOpen: "Open",
       boardProgress: "In Progress",
-      boardDone: "Done",
+      boardDone: "Completed",
       boardEmpty: "No service cases in this column.",
 
       reportsEyebrow: "Service Reports",
@@ -416,19 +436,19 @@ const I18nService = (() => {
       createAccountButton: "Create account",
       teamRestrictedEyebrow: "Access Restricted",
       teamRestrictedHeadline: "Team Management",
-      teamRestrictedText: "This area is only visible to admins.",
+      teamRestrictedText: "This area is only visible to administrators.",
 
       settingsEyebrow: "Portal Settings",
       settingsHeadline: "Project Information",
       settingsVersion: "Current status: presentation prototype v0.4.2",
-      settingsInfo: "Data is currently stored locally in the browser. For production use, a database, user permissions and additional security functions would be recommended.",
+      settingsInfo: "Data is currently stored locally in the browser. For live operation, a database, user permissions, backups, and additional security features would be recommended.",
       settingsDeveloper: "Development: Christoph Dietrich",
       loadDemoButton: "Load demo data",
       resetDemoButton: "Reset demo",
 
       helpEyebrow: "Help & Support",
-      helpHeadline: "Support & Development",
-      helpText: "Internal prototype for a better overview of service, maintenance and field planning.",
+      helpHeadline: "Support & Further Development",
+      helpText: "Internal prototype for a clearer overview of service, maintenance, and scheduling.",
 
       detailEyebrow: "Customer File",
       detailHeadline: "Customer Details",
@@ -442,13 +462,13 @@ const I18nService = (() => {
       printReportButton: "Print report / save as PDF",
 
       mobileStart: "Start",
-      mobileTasks: "Jobs",
-      mobilePlanning: "Planning",
+      mobileTasks: "Assignments",
+      mobilePlanning: "Schedule",
       mobileCustomers: "Customers",
 
       placeholderLoginEmail: "Email",
       placeholderLoginPassword: "Password",
-      placeholderSearch: "Search by customer, city, address, technician, machine type or reminder...",
+      placeholderSearch: "Search by customer, city, address, technician, machine type, or reminder...",
       placeholderCustomerName: "Customer name, e.g. Bowling Arena Leipzig",
       placeholderCity: "City, e.g. Leipzig",
       placeholderAddress: "Address",
@@ -456,7 +476,7 @@ const I18nService = (() => {
       placeholderEmail: "Email",
       placeholderLaneCount: "Number of lanes, e.g. 8",
       placeholderMaintenance: "Maintenance per lane, e.g. twice a year or €150",
-      placeholderNote: "Note about the service case, maintenance or next follow-up",
+      placeholderNote: "Note about the service case, maintenance, or next follow-up",
       placeholderEditNote: "Note",
       placeholderAccountName: "First and last name",
       placeholderAccountPassword: "Password",
@@ -466,19 +486,19 @@ const I18nService = (() => {
       optionAllStatus: "All statuses",
       optionOpen: "Open",
       optionProgress: "In Progress",
-      optionDone: "Done",
+      optionDone: "Completed",
       optionNotAssigned: "Not assigned",
       optionNoMachine: "Machine type / manufacturer not specified",
       optionNoReminder: "No reminder",
 
       systemBowling: "Bowling system",
-      systemSkittles: "Skittles system",
-      systemBoth: "Bowling and skittles system",
+      systemSkittles: "Ninepin bowling system",
+      systemBoth: "Bowling and ninepin bowling system",
 
       serviceMaintenance: "Maintenance",
       serviceRepair: "Repair",
       serviceCallback: "Callback",
-      serviceOffer: "Offer",
+      serviceOffer: "Quote",
       serviceInspection: "Inspection",
 
       priorityNormalOption: "Priority: Normal",
@@ -491,12 +511,12 @@ const I18nService = (() => {
       reminderFeedback: "Feedback pending",
       reminderConfirm: "Confirm appointment",
 
-      roleAdmin: "Admin",
+      roleAdmin: "Administrator",
       roleEmployee: "Employee",
 
       statusOpen: "Open",
       statusProgress: "In Progress",
-      statusDone: "Done",
+      statusDone: "Completed",
 
       priorityNormal: "Normal",
       priorityHigh: "High",
@@ -507,7 +527,7 @@ const I18nService = (() => {
       actionReport: "Service report",
       actionReportShort: "Report",
       actionEdit: "Edit",
-      actionDone: "Mark as done",
+      actionDone: "Mark as completed",
       actionDelete: "Delete",
       actionCall: "Call",
       actionEmail: "Email",
@@ -547,14 +567,14 @@ const I18nService = (() => {
       notAssigned: "Not assigned",
       noNote: "No note available.",
       noReminder: "No reminder",
-      noDateOpen: "Still open",
-      locationOpen: "City open",
-      addressOpen: "Address open",
+      noDateOpen: "Not scheduled yet",
+      locationOpen: "City not specified",
+      addressOpen: "Address not specified",
       serviceCase: "Service case",
       entryCreated: "Entry created",
-      entryEdited: "Entry edited",
+      entryEdited: "Entry updated",
       caseCompleted: "Service case completed",
-      editedBy: "Edited by",
+      editedBy: "Updated by",
       completedBy: "Completed by",
 
       reminderOverdue: "{type} is overdue by {days} day(s).",
@@ -575,12 +595,12 @@ const I18nService = (() => {
       toastCustomerMissing: "Please enter at least a customer name.",
       toastCustomerNotFound: "Service case was not found.",
       toastChangesSaved: "Changes have been saved.",
-      toastCaseDone: "Service case has been marked as done.",
-      toastOnlyAdminsDelete: "Only admins are allowed to delete entries.",
+      toastCaseDone: "Service case has been marked as completed.",
+      toastOnlyAdminsDelete: "Only administrators are allowed to delete entries.",
       toastDeleted: "Entry has been deleted.",
       toastAccountCreated: "Team account has been created.",
-      toastOnlyAdminsAccounts: "Only admins are allowed to create team accounts.",
-      toastAccountMissing: "Please fill in name, email and password.",
+      toastOnlyAdminsAccounts: "Only administrators are allowed to create team accounts.",
+      toastAccountMissing: "Please fill in name, email, and password.",
       toastEmailExists: "This email address is already in use.",
       toastStatusChanged: "Status changed: {status}",
 
@@ -627,6 +647,7 @@ const I18nService = (() => {
 
     updateLogin();
     updateWelcome();
+    updateUpdateModal();
     updateNavigation();
     updateTopbar();
     updateDashboard();
@@ -641,12 +662,32 @@ const I18nService = (() => {
     setText("#loginView .subtitle", t("loginSubtitle"));
     setText("#loginButton", t("loginButton"));
     setText("#loginView .hint", t("demoHint"));
+    setText("#loginLanguageButton", t("languageButton"));
   }
 
   function updateWelcome() {
     setText("#welcomeView .eyebrow", t("welcomeEyebrow"));
     setText("#welcomeTitle", t("welcomeTitle"));
     setText("#welcomeText", t("welcomeText"));
+  }
+
+  function updateUpdateModal() {
+    setText("#updateModal .eyebrow", t("updateEyebrow"));
+    setText("#updateModalTitle", t("updateTitle"));
+    setText("#updateIntro", t("updateIntro"));
+    setText("#confirmUpdateButton", t("updateConfirm"));
+
+    const updateList = document.getElementById("updateList");
+
+    if (updateList) {
+      updateList.innerHTML = `
+        <li>${t("updateItemLanguage")}</li>
+        <li>${t("updateItemDashboard")}</li>
+        <li>${t("updateItemMobile")}</li>
+        <li>${t("updateItemSpacing")}</li>
+        <li>${t("updateItemFuture")}</li>
+      `;
+    }
   }
 
   function updateNavigation() {

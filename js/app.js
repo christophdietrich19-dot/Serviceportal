@@ -47,12 +47,16 @@ function bindGlobalEvents() {
     UIService.closeMenu();
   });
 
+  UIService.getElement("loginLanguageButton")?.addEventListener("click", () => {
+    handleLanguageToggle(false);
+  });
+
   UIService.getElement("languageButton")?.addEventListener("click", () => {
-    handleLanguageToggle();
+    handleLanguageToggle(true);
   });
 
   UIService.getElement("languageButtonSettings")?.addEventListener("click", () => {
-    handleLanguageToggle();
+    handleLanguageToggle(true);
   });
 
   UIService.getElement("themeButton")?.addEventListener("click", () => {
@@ -95,6 +99,14 @@ function bindGlobalEvents() {
 
   UIService.getElement("closeReportButton")?.addEventListener("click", () => {
     UIService.closeModal("reportModal");
+  });
+
+  UIService.getElement("closeUpdateButton")?.addEventListener("click", () => {
+    UIService.closeModal("updateModal");
+  });
+
+  UIService.getElement("confirmUpdateButton")?.addEventListener("click", () => {
+    UIService.closeModal("updateModal");
   });
 
   UIService.getElement("printReportButton")?.addEventListener("click", () => {
@@ -274,6 +286,8 @@ function handleLogin() {
     UIService.showToast(getTranslation("toastWelcome", {
       name: result.user.name
     }));
+
+    showUpdateModalAfterLogin();
   });
 }
 
@@ -330,18 +344,35 @@ function handleAccountCreation() {
   }
 }
 
-function handleLanguageToggle() {
+function handleLanguageToggle(refreshApp) {
   if (typeof I18nService === "undefined") {
     return;
   }
 
   I18nService.toggleLanguage();
 
-  CustomerService.renderAll();
-  AuthService.updateUserDisplay();
-  AuthService.refreshAssignableUserSelects();
+  if (refreshApp) {
+    CustomerService.renderAll();
+
+    if (AuthService.isLoggedIn()) {
+      AuthService.updateUserDisplay();
+      AuthService.refreshAssignableUserSelects();
+    }
+  }
 
   I18nService.applyLanguage();
+}
+
+function showUpdateModalAfterLogin() {
+  setTimeout(() => {
+    if (AuthService.isLoggedIn()) {
+      UIService.openModal("updateModal");
+
+      if (typeof I18nService !== "undefined") {
+        I18nService.applyLanguage();
+      }
+    }
+  }, 400);
 }
 
 function showLoginView() {

@@ -13,6 +13,10 @@
   <!-- LOGIN -->
   <section id="loginView" class="view login-view">
     <div class="login-card">
+      <div class="login-language-row">
+        <button id="loginLanguageButton" class="login-language-button" type="button">English</button>
+      </div>
+
       <p class="eyebrow">Interner Prototyp</p>
       <h1>Serviceportal v0.4.2</h1>
       <p class="subtitle">Service, Wartung und Einsatzplanung übersichtlich verwalten.</p>
@@ -517,6 +521,36 @@
     </main>
 
     <button id="floatingHelpButton" class="help-floating-button" type="button" aria-label="Hilfe öffnen">?</button>
+  </section>
+
+  <!-- UPDATE MODAL -->
+  <section id="updateModal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-card update-card">
+      <div class="modal-header">
+        <div>
+          <p class="eyebrow">Update</p>
+          <h2 id="updateModalTitle">Neu in v0.4.2</h2>
+        </div>
+
+        <button id="closeUpdateButton" class="icon-button" type="button" aria-label="Schließen">×</button>
+      </div>
+
+      <div class="update-content">
+        <p id="updateIntro">
+          Dieser Präsentationsstand wurde für den nächsten Austausch weiter aufgeräumt und erweitert.
+        </p>
+
+        <ul id="updateList">
+          <li>Deutsch / Englisch Umschaltung direkt ab dem Login</li>
+          <li>aufgeräumtes Dashboard und ruhigere Kartenoptik</li>
+          <li>bessere mobile Darstellung mit App-Gefühl</li>
+          <li>bereinigte Abstände und klarere Bedienung</li>
+          <li>Vorbereitung für spätere Datenbank, Benutzerrechte und produktive Nutzung</li>
+        </ul>
+
+        <button id="confirmUpdateButton" type="button">Verstanden</button>
+      </div>
+    </div>
   </section>
 
   <!-- HILFE -->

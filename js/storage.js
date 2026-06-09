@@ -14,9 +14,13 @@ const StorageService = (() => {
           email: "admin@demo.de",
           password: "admin123",
           role: "admin",
-          createdAt: new Date().toISOString()
+          active: true,
+          createdAt: new Date().toISOString(),
+          updatedAt: null
         }
       ]);
+    } else {
+      migrateAccounts();
     }
 
     if (!localStorage.getItem(STORAGE_KEYS.CUSTOMERS)) {
@@ -26,6 +30,20 @@ const StorageService = (() => {
     if (!localStorage.getItem(STORAGE_KEYS.THEME)) {
       saveTheme("light");
     }
+  }
+
+  function migrateAccounts() {
+    const accounts = getAccounts();
+
+    const migratedAccounts = accounts.map(account => {
+      return {
+        active: true,
+        updatedAt: null,
+        ...account
+      };
+    });
+
+    saveAccounts(migratedAccounts);
   }
 
   function getCustomers() {
@@ -81,6 +99,28 @@ const StorageService = (() => {
     saveCustomers(filteredCustomers);
   }
 
+  function reassignCustomers(oldName, newName) {
+    if (!oldName || !newName || oldName === newName) {
+      return;
+    }
+
+    const customers = getCustomers();
+
+    const updatedCustomers = customers.map(customer => {
+      if (customer.assignedTo !== oldName) {
+        return customer;
+      }
+
+      return {
+        ...customer,
+        assignedTo: newName,
+        updatedAt: new Date().toISOString()
+      };
+    });
+
+    saveCustomers(updatedCustomers);
+  }
+
   function getAccounts() {
     return readJson(STORAGE_KEYS.ACCOUNTS, []);
   }
@@ -95,6 +135,8 @@ const StorageService = (() => {
     const newAccount = {
       id: createId(),
       createdAt: new Date().toISOString(),
+      updatedAt: null,
+      active: true,
       ...account
     };
 
@@ -102,6 +144,42 @@ const StorageService = (() => {
     saveAccounts(accounts);
 
     return newAccount;
+  }
+
+  function updateAccount(accountId, updates) {
+    const accounts = getAccounts();
+
+    const updatedAccounts = accounts.map(account => {
+      if (account.id !== accountId) {
+        return account;
+      }
+
+      return {
+        ...account,
+        ...updates,
+        updatedAt: new Date().toISOString()
+      };
+    });
+
+    saveAccounts(updatedAccounts);
+  }
+
+  function deactivateAccount(accountId) {
+    updateAccount(accountId, {
+      active: false
+    });
+  }
+
+  function activateAccount(accountId) {
+    updateAccount(accountId, {
+      active: true
+    });
+  }
+
+  function resetAccountPassword(accountId, newPassword) {
+    updateAccount(accountId, {
+      password: newPassword
+    });
   }
 
   function deleteAccount(accountId) {
@@ -233,7 +311,9 @@ const StorageService = (() => {
         email: "admin@demo.de",
         password: "admin123",
         role: "admin",
-        createdAt: new Date().toISOString()
+        active: true,
+        createdAt: new Date().toISOString(),
+        updatedAt: null
       },
       {
         id: createId(),
@@ -241,7 +321,9 @@ const StorageService = (() => {
         email: "max.schneider@demo.de",
         password: "demo123",
         role: "employee",
-        createdAt: new Date().toISOString()
+        active: true,
+        createdAt: new Date().toISOString(),
+        updatedAt: null
       },
       {
         id: createId(),
@@ -249,7 +331,9 @@ const StorageService = (() => {
         email: "tom.berger@demo.de",
         password: "demo123",
         role: "employee",
-        createdAt: new Date().toISOString()
+        active: true,
+        createdAt: new Date().toISOString(),
+        updatedAt: null
       }
     ];
 
@@ -267,7 +351,9 @@ const StorageService = (() => {
         email: "admin@demo.de",
         password: "admin123",
         role: "admin",
-        createdAt: new Date().toISOString()
+        active: true,
+        createdAt: new Date().toISOString(),
+        updatedAt: null
       }
     ]);
   }
@@ -299,6 +385,7 @@ const StorageService = (() => {
 
   function getFutureDate(days) {
     const date = new Date();
+
     date.setDate(date.getDate() + days);
 
     return date.toISOString().split("T")[0];
@@ -312,10 +399,15 @@ const StorageService = (() => {
     addCustomer,
     updateCustomer,
     deleteCustomer,
+    reassignCustomers,
 
     getAccounts,
     saveAccounts,
     addAccount,
+    updateAccount,
+    deactivateAccount,
+    activateAccount,
+    resetAccountPassword,
     deleteAccount,
 
     getTheme,
