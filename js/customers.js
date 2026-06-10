@@ -108,6 +108,216 @@ const CustomerService = (() => {
           });
 
     UIService.setText("dailyMessage", message);
+
+    renderServiceCockpit({
+      customers,
+      openCustomers,
+      dueCustomers,
+      urgentCustomers
+    });
+  }
+
+  function renderServiceCockpit({ customers, openCustomers, dueCustomers, urgentCustomers }) {
+    const cockpit = ensureServiceCockpit();
+
+    if (!cockpit) {
+      return;
+    }
+
+    const progressCustomers = customers.filter(customer => customer.status === "progress");
+    const doneCustomers = customers.filter(customer => customer.status === "done");
+    const overdueCustomers = getOverdueCustomers(customers);
+    const todayCustomers = getTodayCustomers(customers);
+    const callbackCustomers = getCallbackCustomers(customers);
+    const nextCustomer = getNextScheduledCustomer(customers);
+
+    const nextCustomerHtml = nextCustomer
+      ? `
+        <div class="customer-card" style="margin-top: 16px;">
+          <div class="card-topline">
+            <div>
+              <h3>${ReportService.escapeHtml(nextCustomer.name)}</h3>
+              <p>
+                ${ReportService.escapeHtml(nextCustomer.city || languageText("Ort offen", "City not specified"))}
+                · ${ReminderService.translateStoredServiceType(nextCustomer.serviceType) || languageText("Servicefall", "Service case")}
+              </p>
+              <p>
+                ${languageText("Nächster Termin", "Next appointment")}: 
+                ${nextCustomer.nextDate ? ReminderService.formatDate(nextCustomer.nextDate) : languageText("Noch offen", "Not scheduled yet")}
+              </p>
+              <p>
+                ${languageText("Zugewiesen an", "Assigned to")}: 
+                ${ReportService.escapeHtml(nextCustomer.assignedTo || languageText("Nicht zugewiesen", "Not assigned"))}
+              </p>
+            </div>
+
+            <div class="badges">
+              <span class="badge ${ReminderService.getPriorityBadgeClass(nextCustomer.priority)}">
+                ${ReminderService.getPriorityLabel(nextCustomer.priority)}
+              </span>
+
+              <span class="badge ${ReminderService.getStatusBadgeClass(nextCustomer.status)}">
+                ${ReminderService.getStatusLabel(nextCustomer.status)}
+              </span>
+            </div>
+          </div>
+
+          <div class="card-actions">
+            ${UIService.createActionLinks(nextCustomer)}
+
+            <button class="action-button edit-button" type="button" data-action="detail" data-id="${nextCustomer.id}">
+              ${languageText("Akte öffnen", "Open file")}
+            </button>
+          </div>
+        </div>
+      `
+      : `
+        <p class="empty" style="margin-top: 16px;">
+          ${languageText("Aktuell ist kein nächster Einsatz geplant.", "No next assignment is currently scheduled.")}
+        </p>
+      `;
+
+    cockpit.innerHTML = `
+      <div class="panel-header">
+        <p class="eyebrow">${languageText("Service Cockpit", "Service Cockpit")}</p>
+        <h2>${languageText("Heute im Service", "Today in Service")}</h2>
+      </div>
+
+      <div class="stats-grid" style="margin-bottom: 0;">
+        <article class="stat-card">
+          <p>${languageText("Heute geplant", "Scheduled today")}</p>
+          <h3>${todayCustomers.length}</h3>
+          <span>${languageText("Termine und Einsätze", "Appointments and assignments")}</span>
+        </article>
+
+        <article class="stat-card danger">
+          <p>${languageText("Überfällig", "Overdue")}</p>
+          <h3>${overdueCustomers.length}</h3>
+          <span>${languageText("Rückmeldungen und Erinnerungen", "Follow-ups and reminders")}</span>
+        </article>
+
+        <article class="stat-card warning">
+          <p>${languageText("Dringend", "Urgent")}</p>
+          <h3>${urgentCustomers.length}</h3>
+          <span>${languageText("Fälle mit hoher Priorität", "High-priority cases")}</span>
+        </article>
+
+        <article class="stat-card">
+          <p>${languageText("In Bearbeitung", "In progress")}</p>
+          <h3>${progressCustomers.length}</h3>
+          <span>${languageText("Aktive Einsätze", "Active assignments")}</span>
+        </article>
+
+        <article class="stat-card">
+          <p>${languageText("Offene Rückrufe", "Open callbacks")}</p>
+          <h3>${callbackCustomers.length}</h3>
+          <span>${languageText("Kontakt oder Rückmeldung offen", "Contact or feedback pending")}</span>
+        </article>
+
+        <article class="stat-card highlight">
+          <p>${languageText("Abgeschlossen", "Completed")}</p>
+          <h3>${doneCustomers.length}</h3>
+          <span>${languageText("Erledigte Servicefälle", "Completed service cases")}</span>
+        </article>
+      </div>
+
+      <div class="detail-section" style="margin-top: 22px;">
+        <div class="panel-header" style="margin-bottom: 0;">
+          <p class="eyebrow">${languageText("Nächster Einsatz", "Next Assignment")}</p>
+          <h2>${nextCustomer ? ReportService.escapeHtml(nextCustomer.name) : languageText("Noch kein Einsatz geplant", "No assignment scheduled yet")}</h2>
+        </div>
+
+        ${nextCustomerHtml}
+      </div>
+    `;
+  }
+
+  function ensureServiceCockpit() {
+    let cockpit = UIService.getElement("serviceCockpit");
+
+    if (cockpit) {
+      return cockpit;
+    }
+
+    const dashboardPage = UIService.getElement("dashboardPage");
+
+    if (!dashboardPage) {
+      return null;
+    }
+
+    const heroPanel = dashboardPage.querySelector(".hero-panel");
+
+    if (!heroPanel) {
+      return null;
+    }
+
+    cockpit = document.createElement("section");
+    cockpit.id = "serviceCockpit";
+    cockpit.className = "panel";
+    cockpit.style.marginBottom = "24px";
+
+    cockpit.addEventListener("click", handleListClick);
+
+    heroPanel.insertAdjacentElement("afterend", cockpit);
+
+    return cockpit;
+  }
+
+  function getTodayCustomers(customers) {
+    const today = new Date().toISOString().split("T")[0];
+
+    return customers.filter(customer => {
+      return customer.nextDate === today && customer.status !== "done";
+    });
+  }
+
+  function getOverdueCustomers(customers) {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    return customers.filter(customer => {
+      if (!customer.reminderDate || customer.status === "done") {
+        return false;
+      }
+
+      const reminderDate = new Date(customer.reminderDate);
+      reminderDate.setHours(0, 0, 0, 0);
+
+      return reminderDate < today;
+    });
+  }
+
+  function getCallbackCustomers(customers) {
+    return customers.filter(customer => {
+      if (customer.status === "done") {
+        return false;
+      }
+
+      const reminder = `${customer.reminderType || ""}`.toLowerCase();
+
+      return (
+        reminder.includes("anrufen") ||
+        reminder.includes("rückmeldung") ||
+        reminder.includes("callback") ||
+        reminder.includes("feedback") ||
+        reminder.includes("call")
+      );
+    });
+  }
+
+  function getNextScheduledCustomer(customers) {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    return customers
+      .filter(customer => customer.status !== "done" && customer.nextDate)
+      .sort((a, b) => new Date(a.nextDate) - new Date(b.nextDate))
+      .find(customer => {
+        const date = new Date(customer.nextDate);
+        date.setHours(0, 0, 0, 0);
+
+        return date >= today;
+      }) || null;
   }
 
   function renderCustomers() {
@@ -757,6 +967,18 @@ const CustomerService = (() => {
     return I18nService.getLanguage() === "en" ? "en-GB" : "de-DE";
   }
 
+  function getLanguage() {
+    if (typeof I18nService === "undefined") {
+      return "de";
+    }
+
+    return I18nService.getLanguage();
+  }
+
+  function languageText(german, english) {
+    return getLanguage() === "en" ? english : german;
+  }
+
   function translate(key, fallback, replacements = {}) {
     if (typeof I18nService === "undefined") {
       let text = fallback;
@@ -768,7 +990,9 @@ const CustomerService = (() => {
       return text;
     }
 
-    return I18nService.t(key, replacements);
+    const translated = I18nService.t(key, replacements);
+
+    return translated === key ? fallback : translated;
   }
 
   return {
